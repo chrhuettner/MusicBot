@@ -63,44 +63,56 @@ public class QueueCmd extends MusicCommand
     }
 
     @Override
-    public void doCommand(CommandEvent event)
-    {
-        int pagenum = 1;
-        try
-        {
-            pagenum = Integer.parseInt(event.getArgs());
-        }
-        catch(NumberFormatException ignore){}
-        AudioHandler ah = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
+    public void doCommand(CommandEvent event) {
+        int pagenum = parsePageNumber(event.getArgs());
+        AudioHandler ah = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
         List<QueuedTrack> list = ah.getQueue().getList();
-        if(list.isEmpty())
-        {
-            Message nowp = ah.getNowPlaying(event.getJDA());
-            Message nonowp = ah.getNoMusicPlaying(event.getJDA());
-            Message built = new MessageBuilder()
-                    .setContent(event.getClient().getWarning() + " There is no music in the queue!")
-                    .setEmbeds((nowp==null ? nonowp : nowp).getEmbeds().get(0)).build();
-            event.reply(built, m -> 
-            {
-                if(nowp!=null)
-                    bot.getNowplayingHandler().setLastNPMessage(m);
-            });
+
+        if (list.isEmpty()) {
+            handleEmptyQueue(event, ah);
             return;
         }
+
+        processQueue(event, ah, list, pagenum);
+    }
+
+    private int parsePageNumber(String args) {
+        try {
+            return Integer.parseInt(args);
+        } catch (NumberFormatException ignore) {
+            return 1;
+        }
+    }
+
+    private void handleEmptyQueue(CommandEvent event, AudioHandler ah) {
+        Message nowp = ah.getNowPlaying(event.getJDA());
+        Message nonowp = ah.getNoMusicPlaying(event.getJDA());
+        Message built = new MessageBuilder()
+                .setContent(event.getClient().getWarning() + " There is no music in the queue!")
+                .setEmbeds((nowp == null ? nonowp : nowp).getEmbeds().get(0)).build();
+        event.reply(built, m -> {
+            if (nowp != null)
+                bot.getNowplayingHandler().setLastNPMessage(m);
+        });
+    }
+
+    private void processQueue(CommandEvent event, AudioHandler ah, List<QueuedTrack> list, int pagenum) {
         String[] songs = new String[list.size()];
         long total = 0;
-        for(int i=0; i<list.size(); i++)
-        {
+
+        for (int i = 0; i < list.size(); i++) {
             total += list.get(i).getTrack().getDuration();
             songs[i] = list.get(i).toString();
         }
+
         Settings settings = event.getClient().getSettingsFor(event.getGuild());
-        long fintotal = total;
-        builder.setText((i1,i2) -> getQueueTitle(ah, event.getClient().getSuccess(), songs.length, fintotal, settings.getRepeatMode(), settings.getQueueType()))
+        long finalTotal = total;
+
+        builder.setText((i1, i2) -> getQueueTitle(ah, event.getClient().getSuccess(), songs.length, finalTotal, settings.getRepeatMode(), settings.getQueueType()))
                 .setItems(songs)
                 .setUsers(event.getAuthor())
-                .setColor(event.getSelfMember().getColor())
-                ;
+                .setColor(event.getSelfMember().getColor());
+
         builder.build().paginate(event.getChannel(), pagenum);
     }
     
