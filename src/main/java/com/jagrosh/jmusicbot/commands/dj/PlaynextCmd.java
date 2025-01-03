@@ -16,7 +16,6 @@
 package com.jagrosh.jmusicbot.commands.dj;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.PlayerManager;
 import com.jagrosh.jmusicbot.audio.QueuedTrack;
@@ -40,7 +39,7 @@ public class PlaynextCmd extends DJCommand
 
     private static final String COMMAND_NAME = "playnext";
 
-    private PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
     public PlaynextCmd()
     {
@@ -90,7 +89,7 @@ public class PlaynextCmd extends DJCommand
                 return;
             }
             AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-            int pos = handler.addTrackToFront(new QueuedTrack(track, RequestMetadata.fromResultHandler(track, event)))+1;
+            int pos = handler.addTrackToFront(new QueuedTrack(track, RequestMetadata.fromResultHandler(event)))+1;
             String addMsg = FormatUtil.filter(event.getClient().getSuccess()+" Added **"+track.getInfo().title
                     +"** (`"+ TimeUtil.formatTime(track.getDuration())+"`) "+(pos==0?"to begin playing":" to the queue at position "+pos));
             m.editMessage(addMsg).queue();

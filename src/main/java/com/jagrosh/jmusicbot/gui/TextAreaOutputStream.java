@@ -142,9 +142,7 @@ static private String bytesToString(byte[] ba, int str, int len) {
                 curLength=0;
             }
             return val;
-        }).forEach((val) -> {
-            textArea.append(val);
-        });
+        }).forEach(textArea::append);
         values.clear();
         clear =false;
         queue =true;

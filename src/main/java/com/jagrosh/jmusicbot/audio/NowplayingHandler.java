@@ -42,9 +42,9 @@ public class NowplayingHandler
     private final Bot bot;
     private final HashMap<Long,Pair<Long,Long>> lastNP; // guild -> channel,message
 
-    private BotConfig botConfig;
+    private final BotConfig botConfig;
 
-    private ScheduledExecutorService executorService;
+    private final ScheduledExecutorService executorService;
 
     private static NowplayingHandler nowplayingHandler;
 
@@ -66,7 +66,7 @@ public class NowplayingHandler
     public void init()
     {
         if(!botConfig.useNPImages())
-            executorService.scheduleWithFixedDelay(() -> updateAll(), 0, 5, TimeUnit.SECONDS);
+            executorService.scheduleWithFixedDelay(this::updateAll, 0, 5, TimeUnit.SECONDS);
     }
     
     public void setLastNPMessage(Message m)
@@ -114,7 +114,7 @@ public class NowplayingHandler
                 toRemove.add(guildId);
             }
         }
-        toRemove.forEach(id -> lastNP.remove(id));
+        toRemove.forEach(lastNP::remove);
     }
 
     // "event"-based methods

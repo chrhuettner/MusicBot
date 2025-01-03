@@ -45,7 +45,7 @@ public class RequestMetadata
         return user == null ? 0L : user.id;
     }
 
-    public static RequestMetadata fromResultHandler(AudioTrack track, CommandEvent event)
+    public static RequestMetadata fromResultHandler(CommandEvent event)
     {
         return new RequestMetadata(event.getAuthor(), new RequestInfo(event.getArgs()));
     }

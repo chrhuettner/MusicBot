@@ -31,15 +31,13 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
  */
 public abstract class MusicCommand extends AliasCommand
 {
-    protected final Bot bot;
     protected boolean bePlaying;
     protected boolean beListening;
-    protected PlayerManager playerManager;
+    protected final PlayerManager playerManager;
 
     public MusicCommand(String commandName)
     {
         super(commandName);
-        this.bot = Bot.getInstance();
         this.guildOnly = true;
         this.category = new Category("Music");
         this.playerManager = PlayerManager.getInstance();

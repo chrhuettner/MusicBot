@@ -16,7 +16,6 @@
 package com.jagrosh.jmusicbot.commands.music;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.RequestMetadata;
 import com.jagrosh.jmusicbot.commands.MusicCommand;
@@ -31,7 +30,7 @@ public class SkipCmd extends MusicCommand
 {
     private static final String COMMAND_NAME = "skip";
 
-    private SettingsManager settingsManager;
+    private final SettingsManager settingsManager;
 
     public SkipCmd()
     {

@@ -16,7 +16,6 @@
 package com.jagrosh.jmusicbot.commands.music;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.NowplayingHandler;
 import com.jagrosh.jmusicbot.commands.MusicCommand;
@@ -31,7 +30,7 @@ public class NowplayingCmd extends MusicCommand
 {
     private static final String COMMAND_NAME = "nowplaying";
 
-    private NowplayingHandler nowplayingHandler;
+    private final NowplayingHandler nowplayingHandler;
 
     public NowplayingCmd()
     {
@@ -53,7 +52,7 @@ public class NowplayingCmd extends MusicCommand
         }
         else
         {
-            event.reply(m, msg -> nowplayingHandler.setLastNPMessage(msg));
+            event.reply(m, nowplayingHandler::setLastNPMessage);
         }
     }
 

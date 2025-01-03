@@ -15,27 +15,9 @@
  */
 package com.jagrosh.jmusicbot;
 
-import com.jagrosh.jdautilities.command.CommandClient;
-import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.examples.command.*;
-import com.jagrosh.jmusicbot.commands.admin.*;
-import com.jagrosh.jmusicbot.commands.dj.*;
-import com.jagrosh.jmusicbot.commands.general.*;
-import com.jagrosh.jmusicbot.commands.music.*;
-import com.jagrosh.jmusicbot.commands.owner.*;
 import com.jagrosh.jmusicbot.entities.Prompt;
 import com.jagrosh.jmusicbot.gui.GUI;
-import com.jagrosh.jmusicbot.settings.SettingsManager;
 import com.jagrosh.jmusicbot.utils.OtherUtil;
-import java.awt.Color;
-import java.util.Arrays;
-import javax.security.auth.login.LoginException;
-import net.dv8tion.jda.api.*;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
@@ -48,7 +30,7 @@ public class JMusicBot
 {
     public final static Logger LOG = LoggerFactory.getLogger(JMusicBot.class);
 
-    private static Prompt prompt = Prompt.getInstance();
+    private static final Prompt prompt = Prompt.getInstance();
     private static BotConfig config;
 
     /**

@@ -43,19 +43,19 @@ import org.slf4j.LoggerFactory;
  */
 public class Listener extends ListenerAdapter {
 
-    private BotConfig config;
+    private final BotConfig config;
 
-    private SettingsManager settingsManager;
+    private final SettingsManager settingsManager;
 
-    private NowplayingHandler nowplayingHandler;
+    private final NowplayingHandler nowplayingHandler;
 
-    private AloneInVoiceHandler aloneInVoiceHandler;
+    private final AloneInVoiceHandler aloneInVoiceHandler;
 
-    private PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
-    private ScheduledExecutorService executorService;
+    private final ScheduledExecutorService executorService;
 
-    private Bot bot;
+    private final Bot bot;
 
     public Listener() {
         this.bot = Bot.getInstance();

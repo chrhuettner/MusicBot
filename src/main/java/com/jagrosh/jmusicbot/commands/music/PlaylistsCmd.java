@@ -17,7 +17,6 @@ package com.jagrosh.jmusicbot.commands.music;
 
 import java.util.List;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.commands.MusicCommand;
 import com.jagrosh.jmusicbot.playlist.PlaylistLoader;
 
@@ -29,7 +28,7 @@ public class PlaylistsCmd extends MusicCommand
 {
     private static final String COMMAND_NAME = "playlists";
 
-    private PlaylistLoader playlistLoader;
+    private final PlaylistLoader playlistLoader;
 
     public PlaylistsCmd()
     {

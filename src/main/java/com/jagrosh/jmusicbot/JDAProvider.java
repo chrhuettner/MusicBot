@@ -32,9 +32,9 @@ public class JDAProvider {
     public final static Logger LOG = LoggerFactory.getLogger(JDAProvider.class);
     private static JDA jda;
 
-    private static BotConfig botConfig = BotConfig.getInstance();
+    private static final BotConfig botConfig = BotConfig.getInstance();
 
-    public static SettingsManager settingsManager = SettingsManager.getInstance();
+    public static final SettingsManager settingsManager = SettingsManager.getInstance();
 
     public final static GatewayIntent[] INTENTS = {GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_VOICE_STATES};
 
@@ -58,9 +58,9 @@ public class JDAProvider {
                         .build();
 
                 checkUnsupportedBot(jda, prompt);
-                checkPrefixWarning(jda, botConfig);
+                checkPrefixWarning(jda);
             } catch (LoginException | IllegalArgumentException | ErrorResponseException ex) {
-                handleStartupException(ex, prompt, botConfig);
+                handleStartupException(ex, prompt);
             }
         }
         return jda;
@@ -76,20 +76,20 @@ public class JDAProvider {
         }
     }
 
-    private static void checkPrefixWarning(JDA jda, BotConfig config) {
-        if (!"@mention".equals(config.getPrefix())) {
+    private static void checkPrefixWarning(JDA jda) {
+        if (!"@mention".equals(botConfig.getPrefix())) {
             LOG.info("JMusicBot", "You currently have a custom prefix set. If your prefix is not working, make sure that the 'MESSAGE CONTENT INTENT' is Enabled " +
                     "on https://discord.com/developers/applications/" + jda.getSelfUser().getId() + "/bot");
         }
     }
 
-    private static void handleStartupException(Exception ex, Prompt prompt, BotConfig config) {
+    private static void handleStartupException(Exception ex, Prompt prompt) {
         if (ex instanceof LoginException) {
             prompt.alert(Prompt.Level.ERROR, "JMusicBot", ex + "\nPlease make sure you are editing the correct config.txt file, " +
-                    "and that you have used the correct token (not the 'secret'!)\nConfig Location: " + config.getConfigLocation());
+                    "and that you have used the correct token (not the 'secret'!)\nConfig Location: " + botConfig.getConfigLocation());
         } else if (ex instanceof IllegalArgumentException) {
             prompt.alert(Prompt.Level.ERROR, "JMusicBot", "Some aspect of the configuration is invalid: " + ex +
-                    "\nConfig Location: " + config.getConfigLocation());
+                    "\nConfig Location: " + botConfig.getConfigLocation());
         } else if (ex instanceof ErrorResponseException) {
             prompt.alert(Prompt.Level.ERROR, "JMusicBot", ex + "\nInvalid response returned when attempting to connect, " +
                     "please make sure you're connected to the internet");
@@ -99,7 +99,7 @@ public class JDAProvider {
 
     private static CommandClient createCommandClient() {
         AboutCommand aboutCommand = createAboutCommand();
-        CommandClientBuilder cb = setupCommandClient(settingsManager, aboutCommand);
+        CommandClientBuilder cb = setupCommandClient(aboutCommand);
         return cb.build();
     }
 
@@ -113,7 +113,7 @@ public class JDAProvider {
         return aboutCommand;
     }
 
-    private static CommandClientBuilder setupCommandClient(SettingsManager settings, AboutCommand aboutCommand) {
+    private static CommandClientBuilder setupCommandClient( AboutCommand aboutCommand) {
         CommandClientBuilder cb = new CommandClientBuilder()
                 .setPrefix(botConfig.getPrefix())
                 .setAlternativePrefix(botConfig.getAltPrefix())
@@ -121,7 +121,7 @@ public class JDAProvider {
                 .setEmojis(botConfig.getSuccess(), botConfig.getWarning(), botConfig.getError())
                 .setHelpWord(botConfig.getHelp())
                 .setLinkedCacheSize(200)
-                .setGuildSettingsManager(settings)
+                .setGuildSettingsManager(settingsManager)
                 .addCommands(aboutCommand, new PingCommand(), new SettingsCmd(),
                         new LyricsCmd(), new NowplayingCmd(), new PlayCmd(), new PlaylistsCmd(), new QueueCmd(), new RemoveCmd(),
                         new SearchCmd(), new SCSearchCmd(), new SeekCmd(), new ShuffleCmd(), new SkipCmd(),

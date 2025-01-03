@@ -28,7 +28,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.ButtonMenu;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.QueuedTrack;
 import com.jagrosh.jmusicbot.commands.DJCommand;
@@ -53,9 +52,9 @@ public class PlayCmd extends MusicCommand
 
     private static final String COMMAND_NAME = "play";
 
-    private PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
-    private PlaylistLoader playlistLoader;
+    private final PlaylistLoader playlistLoader;
 
     public PlayCmd()
     {
@@ -125,7 +124,7 @@ public class PlayCmd extends MusicCommand
                 return;
             }
             AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-            int pos = handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(track, event)))+1;
+            int pos = handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(event)))+1;
             String addMsg = FormatUtil.filter(event.getClient().getSuccess()+" Added **"+track.getInfo().title
                     +"** (`"+ TimeUtil.formatTime(track.getDuration())+"`) "+(pos==0?"to begin playing":" to the queue at position "+pos));
             if(playlist==null || !event.getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_ADD_REACTION))
@@ -157,7 +156,7 @@ public class PlayCmd extends MusicCommand
                 if(!botConfig.isTooLong(track) && !track.equals(exclude))
                 {
                     AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-                    handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(track, event)));
+                    handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(event)));
                     count[0]++;
                 }
             });
@@ -257,7 +256,7 @@ public class PlayCmd extends MusicCommand
             event.getChannel().sendMessage(loadingEmoji+" Loading playlist **"+event.getArgs()+"**... ("+playlist.getItems().size()+" items)").queue(m -> 
             {
                 AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-                playlist.loadTracks(playerManager, (at)->handler.addTrack(new QueuedTrack(at, RequestMetadata.fromResultHandler(at, event))), () -> {
+                playlist.loadTracks(playerManager, (at)->handler.addTrack(new QueuedTrack(at, RequestMetadata.fromResultHandler(event))), () -> {
                     StringBuilder builder = new StringBuilder(playlist.getTracks().isEmpty() 
                             ? event.getClient().getWarning()+" No tracks were loaded!" 
                             : event.getClient().getSuccess()+" Loaded **"+playlist.getTracks().size()+"** tracks!");

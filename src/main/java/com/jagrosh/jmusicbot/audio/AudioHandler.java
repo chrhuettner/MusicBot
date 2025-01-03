@@ -68,15 +68,15 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
     private AudioFrame lastFrame;
     private AbstractQueue<QueuedTrack> queue;
 
-    private BotConfig botConfig;
+    private final BotConfig botConfig;
 
-    private SettingsManager settingsManager;
+    private final SettingsManager settingsManager;
 
-    private PlaylistLoader playlistLoader;
+    private final PlaylistLoader playlistLoader;
 
-    private Bot bot;
+    private final Bot bot;
 
-    private NowplayingHandler nowplayingHandler;
+    private final NowplayingHandler nowplayingHandler;
 
     protected AudioHandler(PlayerManager manager, Guild guild, AudioPlayer player)
     {

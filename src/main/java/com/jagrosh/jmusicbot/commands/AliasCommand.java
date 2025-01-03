@@ -5,7 +5,7 @@ import com.jagrosh.jmusicbot.BotConfig;
 
 public abstract class AliasCommand extends Command {
 
-    protected BotConfig botConfig;
+    protected final BotConfig botConfig;
 
     public AliasCommand(String commandName) {
         this.botConfig = BotConfig.getInstance();

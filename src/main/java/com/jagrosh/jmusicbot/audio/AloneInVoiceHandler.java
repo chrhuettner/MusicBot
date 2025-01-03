@@ -19,7 +19,6 @@ import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.BotConfig;
 import com.jagrosh.jmusicbot.JDAProvider;
 import com.jagrosh.jmusicbot.ScheduledExecutorServiceProvider;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
@@ -37,15 +36,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class AloneInVoiceHandler
 {
-    private final Bot bot;
     private final HashMap<Long, Instant> aloneSince = new HashMap<>();
     private long aloneTimeUntilStop = 0;
 
-    private BotConfig botConfig;
+    private final BotConfig botConfig;
 
-    private PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
-    private ScheduledExecutorService executorService;
+    private final ScheduledExecutorService executorService;
     private static AloneInVoiceHandler aloneInVoiceHandler;
 
     public static AloneInVoiceHandler getInstance(){
@@ -57,7 +55,6 @@ public class AloneInVoiceHandler
 
     private AloneInVoiceHandler()
     {
-        this.bot = Bot.getInstance();
         this.botConfig = BotConfig.getInstance();
         this.playerManager = PlayerManager.getInstance();
         this.executorService = ScheduledExecutorServiceProvider.getInstance();
@@ -68,7 +65,7 @@ public class AloneInVoiceHandler
     {
         aloneTimeUntilStop = botConfig.getAloneTimeUntilStop();
         if(aloneTimeUntilStop > 0)
-            executorService.scheduleWithFixedDelay(() -> check(), 0, 5, TimeUnit.SECONDS);
+            executorService.scheduleWithFixedDelay(this::check, 0, 5, TimeUnit.SECONDS);
     }
     
     private void check()
@@ -91,7 +88,7 @@ public class AloneInVoiceHandler
 
             toRemove.add(entrySet.getKey());
         }
-        toRemove.forEach(id -> aloneSince.remove(id));
+        toRemove.forEach(aloneSince::remove);
     }
 
     public void onVoiceUpdate(GuildVoiceUpdateEvent event)

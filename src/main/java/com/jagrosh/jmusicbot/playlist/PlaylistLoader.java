@@ -221,10 +221,10 @@ public class PlaylistLoader
                                     loaded.set(first, loaded.get(second));
                                     loaded.set(second, tmp);
                                 }
-                            loaded.removeIf(track -> config.isTooLong(track));
+                            loaded.removeIf(config::isTooLong);
                             loaded.forEach(at -> at.setUserData(0L));
                             tracks.addAll(loaded);
-                            loaded.forEach(at -> consumer.accept(at));
+                            loaded.forEach(consumer);
                         }
                         done();
                     }

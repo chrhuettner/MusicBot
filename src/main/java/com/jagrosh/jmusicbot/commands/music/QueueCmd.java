@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.Paginator;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.EventWaiterProvider;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.NowplayingHandler;
@@ -45,7 +44,7 @@ public class QueueCmd extends MusicCommand
 
     private static final String COMMAND_NAME = "queue";
 
-    private NowplayingHandler nowplayingHandler;
+    private final NowplayingHandler nowplayingHandler;
 
     public QueueCmd()
     {

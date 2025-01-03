@@ -27,7 +27,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.OrderedMenu;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.QueuedTrack;
 import com.jagrosh.jmusicbot.commands.MusicCommand;
@@ -47,7 +46,7 @@ public class SearchCmd extends MusicCommand
 
     private static final String COMMAND_NAME = "search";
 
-    private PlayerManager playerManager;
+    private final PlayerManager playerManager;
 
     public SearchCmd()
     {
@@ -106,7 +105,7 @@ public class SearchCmd extends MusicCommand
                 return;
             }
             AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-            int pos = handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(track, event)))+1;
+            int pos = handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(event)))+1;
             m.editMessage(FormatUtil.filter(event.getClient().getSuccess()+" Added **"+track.getInfo().title
                     +"** (`"+ TimeUtil.formatTime(track.getDuration())+"`) "+(pos==0 ? "to begin playing"
                         : " to the queue at position "+pos))).queue();
@@ -128,7 +127,7 @@ public class SearchCmd extends MusicCommand
                             return;
                         }
                         AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-                        int pos = handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(track, event)))+1;
+                        int pos = handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(event)))+1;
                         event.replySuccess("Added **" + FormatUtil.filter(track.getInfo().title)
                                 + "** (`" + TimeUtil.formatTime(track.getDuration()) + "`) " + (pos==0 ? "to begin playing" 
                                     : " to the queue at position "+pos));

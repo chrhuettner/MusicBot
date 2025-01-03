@@ -16,7 +16,6 @@
 package com.jagrosh.jmusicbot.audio;
 
 import com.dunctebot.sourcemanagers.DuncteBotSources;
-import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.BotConfig;
 import com.jagrosh.jmusicbot.settings.SettingsManager;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
@@ -40,11 +39,11 @@ import net.dv8tion.jda.api.entities.Guild;
  */
 public class PlayerManager extends DefaultAudioPlayerManager
 {
-    private BotConfig botConfig;
+    private final BotConfig botConfig;
 
     private static PlayerManager playerManager;
 
-    private SettingsManager settingsManager;
+    private final SettingsManager settingsManager;
     
     private PlayerManager()
     {
@@ -62,7 +61,7 @@ public class PlayerManager extends DefaultAudioPlayerManager
     
     public void init()
     {
-        TransformativeAudioSourceManager.createTransforms(botConfig.getTransforms()).forEach(t -> registerSourceManager(t));
+        TransformativeAudioSourceManager.createTransforms(botConfig.getTransforms()).forEach(this::registerSourceManager);
 
         YoutubeAudioSourceManager yt = new YoutubeAudioSourceManager(true);
         yt.setPlaylistPageCount(botConfig.getMaxYTPlaylistPages());
