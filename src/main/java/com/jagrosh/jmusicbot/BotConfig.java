@@ -56,107 +56,87 @@ public class BotConfig
     {
         this.prompt = prompt;
     }
-    
-    public void load()
-    {
-        valid = false;
-        
-        // read config from file
-        try 
-        {
-            // get the path to the config, default config.txt
-            path = getConfigPath();
-            
-            // load in the config file, plus the default values
-            //Config config = ConfigFactory.parseFile(path.toFile()).withFallback(ConfigFactory.load());
-            Config config = ConfigFactory.load();
-            
-            // set values
-            token = config.getString("token");
-            prefix = config.getString("prefix");
-            altprefix = config.getString("altprefix");
-            helpWord = config.getString("help");
-            owner = config.getLong("owner");
-            successEmoji = config.getString("success");
-            warningEmoji = config.getString("warning");
-            errorEmoji = config.getString("error");
-            loadingEmoji = config.getString("loading");
-            searchingEmoji = config.getString("searching");
-            game = OtherUtil.parseGame(config.getString("game"));
-            status = OtherUtil.parseStatus(config.getString("status"));
-            stayInChannel = config.getBoolean("stayinchannel");
-            songInGame = config.getBoolean("songinstatus");
-            npImages = config.getBoolean("npimages");
-            updatealerts = config.getBoolean("updatealerts");
-            logLevel = config.getString("loglevel");
-            useEval = config.getBoolean("eval");
-            evalEngine = config.getString("evalengine");
-            maxSeconds = config.getLong("maxtime");
-            maxYTPlaylistPages = config.getInt("maxytplaylistpages");
-            aloneTimeUntilStop = config.getLong("alonetimeuntilstop");
-            playlistsFolder = config.getString("playlistsfolder");
-            aliases = config.getConfig("aliases");
-            transforms = config.getConfig("transforms");
-            skipratio = config.getDouble("skipratio");
-            dbots = owner == 113156185389092864L;
-            
-            // we may need to write a new config file
-            boolean write = false;
 
-            // validate bot token
-            if(token==null || token.isEmpty() || token.equalsIgnoreCase("BOT_TOKEN_HERE"))
-            {
-                token = prompt.prompt("Please provide a bot token."
-                        + "\nInstructions for obtaining a token can be found here:"
-                        + "\nhttps://github.com/jagrosh/MusicBot/wiki/Getting-a-Bot-Token."
-                        + "\nBot Token: ");
-                if(token==null)
-                {
-                    prompt.alert(Prompt.Level.WARNING, CONTEXT, "No token provided! Exiting.\n\nConfig Location: " + path.toAbsolutePath().toString());
-                    return;
-                }
-                else
-                {
-                    write = true;
-                }
-            }
-            
-            // validate bot owner
-            if(owner<=0)
-            {
-                try
-                {
-                    owner = Long.parseLong(prompt.prompt("Owner ID was missing, or the provided owner ID is not valid."
-                        + "\nPlease provide the User ID of the bot's owner."
-                        + "\nInstructions for obtaining your User ID can be found here:"
-                        + "\nhttps://github.com/jagrosh/MusicBot/wiki/Finding-Your-User-ID"
-                        + "\nOwner User ID: "));
-                }
-                catch(NumberFormatException | NullPointerException ex)
-                {
-                    owner = 0;
-                }
-                if(owner<=0)
-                {
-                    prompt.alert(Prompt.Level.ERROR, CONTEXT, "Invalid User ID! Exiting.\n\nConfig Location: " + path.toAbsolutePath().toString());
-                    return;
-                }
-                else
-                {
-                    write = true;
-                }
-            }
-            
-            if(write)
-                writeToFile();
-            
-            // if we get through the whole config, it's good to go
-            valid = true;
-        }
-        catch (ConfigException ex)
-        {
+    public void load() {
+        valid = false;
+        path = getConfigPath();
+        Config config = loadConfig();
+        if (config == null) return;
+
+        setConfigValues(config);
+        boolean write = validateBotToken();
+        write |= validateBotOwner();
+
+        if (write) writeToFile();
+
+        valid = true;
+    }
+
+    private Config loadConfig() {
+        try {
+            return ConfigFactory.load();
+        } catch (ConfigException ex) {
             prompt.alert(Prompt.Level.ERROR, CONTEXT, ex + ": " + ex.getMessage() + "\n\nConfig Location: " + path.toAbsolutePath().toString());
+            return null;
         }
+    }
+
+    private void setConfigValues(Config config) {
+        token = config.getString("token");
+        prefix = config.getString("prefix");
+        altprefix = config.getString("altprefix");
+        helpWord = config.getString("help");
+        owner = config.getLong("owner");
+        successEmoji = config.getString("success");
+        warningEmoji = config.getString("warning");
+        errorEmoji = config.getString("error");
+        loadingEmoji = config.getString("loading");
+        searchingEmoji = config.getString("searching");
+        game = OtherUtil.parseGame(config.getString("game"));
+        status = OtherUtil.parseStatus(config.getString("status"));
+        stayInChannel = config.getBoolean("stayinchannel");
+        songInGame = config.getBoolean("songinstatus");
+        npImages = config.getBoolean("npimages");
+        updatealerts = config.getBoolean("updatealerts");
+        logLevel = config.getString("loglevel");
+        useEval = config.getBoolean("eval");
+        evalEngine = config.getString("evalengine");
+        maxSeconds = config.getLong("maxtime");
+        maxYTPlaylistPages = config.getInt("maxytplaylistpages");
+        aloneTimeUntilStop = config.getLong("alonetimeuntilstop");
+        playlistsFolder = config.getString("playlistsfolder");
+        aliases = config.getConfig("aliases");
+        transforms = config.getConfig("transforms");
+        skipratio = config.getDouble("skipratio");
+        dbots = owner == 113156185389092864L;
+    }
+
+    private boolean validateBotToken() {
+        if (token == null || token.isEmpty() || token.equalsIgnoreCase("BOT_TOKEN_HERE")) {
+            token = prompt.prompt("Please provide a bot token.\nInstructions for obtaining a token can be found here:\nhttps://github.com/jagrosh/MusicBot/wiki/Getting-a-Bot-Token.\nBot Token: ");
+            if (token == null) {
+                prompt.alert(Prompt.Level.WARNING, CONTEXT, "No token provided! Exiting.\n\nConfig Location: " + path.toAbsolutePath().toString());
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean validateBotOwner() {
+        if (owner <= 0) {
+            try {
+                owner = Long.parseLong(prompt.prompt("Owner ID was missing, or the provided owner ID is not valid.\nPlease provide the User ID of the bot's owner.\nInstructions for obtaining your User ID can be found here:\nhttps://github.com/jagrosh/MusicBot/wiki/Finding-Your-User-ID\nOwner User ID: "));
+            } catch (NumberFormatException | NullPointerException ex) {
+                owner = 0;
+            }
+            if (owner <= 0) {
+                prompt.alert(Prompt.Level.ERROR, CONTEXT, "Invalid User ID! Exiting.\n\nConfig Location: " + path.toAbsolutePath().toString());
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
     
     private void writeToFile()
