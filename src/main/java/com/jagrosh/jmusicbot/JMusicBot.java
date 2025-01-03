@@ -67,106 +67,110 @@ public class JMusicBot
             }
         startBot();
     }
-    
-    private static void startBot()
-    {
-        // create prompt to handle startup
-        Prompt prompt = new Prompt("JMusicBot");
-        
-        // startup checks
-        OtherUtil.checkVersion(prompt);
-        OtherUtil.checkJavaVersion(prompt);
-        
-        // load config
-        BotConfig config = new BotConfig(prompt);
-        config.load();
-        if(!config.isValid())
-            return;
-        LOG.info("Loaded config from " + config.getConfigLocation());
 
-        // set log level from config
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(
-                Level.toLevel(config.getLogLevel(), Level.INFO));
-        
-        // set up the listener
+    private static void startBot() {
+        Prompt prompt = createPrompt();
+        BotConfig config = loadConfig(prompt);
+        if (config == null) return;
+
+        setLogLevel(config);
+
         EventWaiter waiter = new EventWaiter();
         SettingsManager settings = new SettingsManager();
         Bot bot = new Bot(waiter, config, settings);
         CommandClient client = createCommandClient(config, settings, bot);
-        
-        
-        if(!prompt.isNoGUI())
-        {
-            try 
-            {
+
+        initializeGUI(bot, prompt, config);
+
+        startJDA(bot, client, waiter, config, prompt);
+    }
+
+    private static Prompt createPrompt() {
+        return new Prompt("JMusicBot");
+    }
+
+    private static BotConfig loadConfig(Prompt prompt) {
+        OtherUtil.checkVersion(prompt);
+        OtherUtil.checkJavaVersion(prompt);
+
+        BotConfig config = new BotConfig(prompt);
+        config.load();
+        if (!config.isValid()) return null;
+
+        LOG.info("Loaded config from " + config.getConfigLocation());
+        return config;
+    }
+
+    private static void setLogLevel(BotConfig config) {
+        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME))
+                .setLevel(Level.toLevel(config.getLogLevel(), Level.INFO));
+    }
+
+    private static void initializeGUI(Bot bot, Prompt prompt, BotConfig config) {
+        if (!prompt.isNoGUI()) {
+            try {
                 GUI gui = new GUI(bot);
                 bot.setGUI(gui);
                 gui.init();
-
                 LOG.info("Loaded config from " + config.getConfigLocation());
-            }
-            catch(Exception e)
-            {
-                LOG.error("Could not start GUI. If you are "
-                        + "running on a server or in a location where you cannot display a "
-                        + "window, please run in nogui mode using the -Dnogui=true flag.");
+            } catch (Exception e) {
+                LOG.error("Could not start GUI. If you are running on a server or in a location " +
+                        "where you cannot display a window, please run in nogui mode using the -Dnogui=true flag.");
             }
         }
-        
-        // attempt to log in and start
-        try
-        {
+    }
+
+    private static void startJDA(Bot bot, CommandClient client, EventWaiter waiter, BotConfig config, Prompt prompt) {
+        try {
             JDA jda = JDABuilder.create(config.getToken(), Arrays.asList(INTENTS))
                     .enableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE)
                     .disableCache(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE, CacheFlag.ONLINE_STATUS)
                     .setActivity(config.isGameNone() ? null : Activity.playing("loading..."))
-                    .setStatus(config.getStatus()==OnlineStatus.INVISIBLE || config.getStatus()==OnlineStatus.OFFLINE 
+                    .setStatus(config.getStatus() == OnlineStatus.INVISIBLE || config.getStatus() == OnlineStatus.OFFLINE
                             ? OnlineStatus.INVISIBLE : OnlineStatus.DO_NOT_DISTURB)
                     .addEventListeners(client, waiter, new Listener(bot))
                     .setBulkDeleteSplittingEnabled(true)
                     .build();
-            bot.setJDA(jda);
 
-            // check if something about the current startup is not supported
-            String unsupportedReason = OtherUtil.getUnsupportedBotReason(jda);
-            if (unsupportedReason != null)
-            {
-                prompt.alert(Prompt.Level.ERROR, "JMusicBot", "JMusicBot cannot be run on this Discord bot: " + unsupportedReason);
-                try{ Thread.sleep(5000);}catch(InterruptedException ignored){} // this is awful but until we have a better way...
-                jda.shutdown();
-                System.exit(1);
-            }
-            
-            // other check that will just be a warning now but may be required in the future
-            // check if the user has changed the prefix and provide info about the 
-            // message content intent
-            if(!"@mention".equals(config.getPrefix()))
-            {
-                LOG.info("JMusicBot", "You currently have a custom prefix set. "
-                        + "If your prefix is not working, make sure that the 'MESSAGE CONTENT INTENT' is Enabled "
-                        + "on https://discord.com/developers/applications/" + jda.getSelfUser().getId() + "/bot");
-            }
+            bot.setJDA(jda);
+            checkUnsupportedBot(jda, prompt);
+            checkPrefixWarning(jda, config);
+        } catch (LoginException | IllegalArgumentException | ErrorResponseException ex) {
+            handleStartupException(ex, prompt, config);
         }
-        catch (LoginException ex)
-        {
-            prompt.alert(Prompt.Level.ERROR, "JMusicBot", ex + "\nPlease make sure you are "
-                    + "editing the correct config.txt file, and that you have used the "
-                    + "correct token (not the 'secret'!)\nConfig Location: " + config.getConfigLocation());
-            System.exit(1);
-        }
-        catch(IllegalArgumentException ex)
-        {
-            prompt.alert(Prompt.Level.ERROR, "JMusicBot", "Some aspect of the configuration is "
-                    + "invalid: " + ex + "\nConfig Location: " + config.getConfigLocation());
-            System.exit(1);
-        }
-        catch(ErrorResponseException ex)
-        {
-            prompt.alert(Prompt.Level.ERROR, "JMusicBot", ex + "\nInvalid reponse returned when "
-                    + "attempting to connect, please make sure you're connected to the internet");
+    }
+
+    private static void checkUnsupportedBot(JDA jda, Prompt prompt) {
+        String unsupportedReason = OtherUtil.getUnsupportedBotReason(jda);
+        if (unsupportedReason != null) {
+            prompt.alert(Prompt.Level.ERROR, "JMusicBot", "JMusicBot cannot be run on this Discord bot: " + unsupportedReason);
+            try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
+            jda.shutdown();
             System.exit(1);
         }
     }
+
+    private static void checkPrefixWarning(JDA jda, BotConfig config) {
+        if (!"@mention".equals(config.getPrefix())) {
+            LOG.info("JMusicBot", "You currently have a custom prefix set. If your prefix is not working, make sure that the 'MESSAGE CONTENT INTENT' is Enabled " +
+                    "on https://discord.com/developers/applications/" + jda.getSelfUser().getId() + "/bot");
+        }
+    }
+
+    private static void handleStartupException(Exception ex, Prompt prompt, BotConfig config) {
+        if (ex instanceof LoginException) {
+            prompt.alert(Prompt.Level.ERROR, "JMusicBot", ex + "\nPlease make sure you are editing the correct config.txt file, " +
+                    "and that you have used the correct token (not the 'secret'!)\nConfig Location: " + config.getConfigLocation());
+        } else if (ex instanceof IllegalArgumentException) {
+            prompt.alert(Prompt.Level.ERROR, "JMusicBot", "Some aspect of the configuration is invalid: " + ex +
+                    "\nConfig Location: " + config.getConfigLocation());
+        } else if (ex instanceof ErrorResponseException) {
+            prompt.alert(Prompt.Level.ERROR, "JMusicBot", ex + "\nInvalid response returned when attempting to connect, " +
+                    "please make sure you're connected to the internet");
+        }
+        System.exit(1);
+    }
+
     
     private static CommandClient createCommandClient(BotConfig config, SettingsManager settings, Bot bot)
     {
