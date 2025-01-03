@@ -37,9 +37,6 @@ import net.dv8tion.jda.api.entities.Guild;
 public class Bot
 {
     private boolean shuttingDown = false;
-    private JDA jda;
-    private GUI gui;
-
     private ScheduledExecutorService executorService;
     private static Bot bot;
 
@@ -55,6 +52,7 @@ public class Bot
     
     public void closeAudioConnection(long guildId)
     {
+        JDA jda = JDAProvider.getInstance();
         Guild guild = jda.getGuildById(guildId);
         if(guild!=null)
             executorService.submit(() -> guild.getAudioManager().closeAudioConnection());
@@ -62,6 +60,7 @@ public class Bot
     
     public void resetGame()
     {
+        JDA jda = JDAProvider.getInstance();
         BotConfig config = BotConfig.getInstance();
         Activity game = config.getGame()==null || config.getGame().getName().equalsIgnoreCase("none") ? null : config.getGame();
         if(!Objects.equals(jda.getPresence().getActivity(), game))
@@ -70,6 +69,7 @@ public class Bot
 
     public void shutdown()
     {
+        JDA jda = JDAProvider.getInstance();
         if(shuttingDown)
             return;
         shuttingDown = true;
@@ -91,10 +91,5 @@ public class Bot
         if(GUI.hasInstance())
             GUI.getInstance().dispose();
         System.exit(0);
-    }
-
-    public void setJDA(JDA jda)
-    {
-        this.jda = jda;
     }
 }
