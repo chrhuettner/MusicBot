@@ -46,51 +46,62 @@ public class SeekCmd extends MusicCommand
     }
 
     @Override
-    public void doCommand(CommandEvent event)
-    {
+    public void doCommand(CommandEvent event) {
         AudioHandler handler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
         AudioTrack playingTrack = handler.getPlayer().getPlayingTrack();
-        if (!playingTrack.isSeekable())
-        {
+
+        if (!isTrackSeekable(event, playingTrack)) return;
+        if (!hasSeekPermission(event, playingTrack)) return;
+
+        TimeUtil.SeekTime seekTime = parseSeekTime(event);
+        if (seekTime == null) return;
+
+        if (!isSeekWithinBounds(event, playingTrack, seekTime)) return;
+
+        seekTrack(event, playingTrack, seekTime);
+    }
+
+    private boolean isTrackSeekable(CommandEvent event, AudioTrack playingTrack) {
+        if (!playingTrack.isSeekable()) {
             event.replyError("This track is not seekable.");
-            return;
+            return false;
         }
+        return true;
+    }
 
-
-        if (!DJCommand.checkDJPermission(event) && playingTrack.getUserData(RequestMetadata.class).getOwner() != event.getAuthor().getIdLong())
-        {
+    private boolean hasSeekPermission(CommandEvent event, AudioTrack playingTrack) {
+        if (!DJCommand.checkDJPermission(event) && playingTrack.getUserData(RequestMetadata.class).getOwner() != event.getAuthor().getIdLong()) {
             event.replyError("You cannot seek **" + playingTrack.getInfo().title + "** because you didn't add it!");
-            return;
+            return false;
         }
+        return true;
+    }
 
-        String args = event.getArgs();
-        TimeUtil.SeekTime seekTime = TimeUtil.parseTime(args);
-        if (seekTime == null)
-        {
+    private TimeUtil.SeekTime parseSeekTime(CommandEvent event) {
+        TimeUtil.SeekTime seekTime = TimeUtil.parseTime(event.getArgs());
+        if (seekTime == null) {
             event.replyError("Invalid seek! Expected format: " + arguments + "\nExamples: `1:02:23` `+1:10` `-90`, `1h10m`, `+90s`");
-            return;
         }
+        return seekTime;
+    }
 
-        long currentPosition = playingTrack.getPosition();
-        long trackDuration = playingTrack.getDuration();
+    private boolean isSeekWithinBounds(CommandEvent event, AudioTrack playingTrack, TimeUtil.SeekTime seekTime) {
+        long seekMilliseconds = seekTime.relative ? playingTrack.getPosition() + seekTime.milliseconds : seekTime.milliseconds;
+        if (seekMilliseconds > playingTrack.getDuration()) {
+            event.replyError("Cannot seek to `" + TimeUtil.formatTime(seekMilliseconds) + "` because the current track is `" + TimeUtil.formatTime(playingTrack.getDuration()) + "` long!");
+            return false;
+        }
+        return true;
+    }
 
-        long seekMilliseconds = seekTime.relative ? currentPosition + seekTime.milliseconds : seekTime.milliseconds;
-        if (seekMilliseconds > trackDuration)
-        {
-            event.replyError("Cannot seek to `" + TimeUtil.formatTime(seekMilliseconds) + "` because the current track is `" + TimeUtil.formatTime(trackDuration) + "` long!");
-            return;
-        }
-        
-        try
-        {
-            playingTrack.setPosition(seekMilliseconds);
-        }
-        catch (Exception e)
-        {
+    private void seekTrack(CommandEvent event, AudioTrack playingTrack, TimeUtil.SeekTime seekTime) {
+        try {
+            playingTrack.setPosition(seekTime.relative ? playingTrack.getPosition() + seekTime.milliseconds : seekTime.milliseconds);
+            event.replySuccess("Successfully seeked to `" + TimeUtil.formatTime(playingTrack.getPosition()) + "/" + TimeUtil.formatTime(playingTrack.getDuration()) + "`!");
+        } catch (Exception e) {
             event.replyError("An error occurred while trying to seek: " + e.getMessage());
             LOG.warn("Failed to seek track " + playingTrack.getIdentifier(), e);
-            return;
         }
-        event.replySuccess("Successfully seeked to `" + TimeUtil.formatTime(playingTrack.getPosition()) + "/" + TimeUtil.formatTime(playingTrack.getDuration()) + "`!");
     }
+
 }
