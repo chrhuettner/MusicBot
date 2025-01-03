@@ -37,7 +37,15 @@ public class SettingsManager implements GuildSettingsManager<Settings>
     private final static String SETTINGS_FILE = "serversettings.json";
     private final HashMap<Long,Settings> settings;
 
-    public SettingsManager()
+    private static SettingsManager settingsManager;
+    public static SettingsManager getInstance(){
+        if(settingsManager == null){
+            settingsManager = new SettingsManager();
+        }
+        return settingsManager;
+    }
+
+    private SettingsManager()
     {
         this.settings = new HashMap<>();
 

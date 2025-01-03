@@ -44,7 +44,7 @@ public class DebugCmd extends OwnerCommand
         super(COMMAND_NAME);
         this.help = "shows debug info";
         this.guildOnly = false;
-        this.botConfig = BotConfig.getBotConfig();
+        this.botConfig = BotConfig.getInstance();
     }
 
     @Override

@@ -20,6 +20,7 @@ import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.RequestMetadata;
 import com.jagrosh.jmusicbot.commands.MusicCommand;
+import com.jagrosh.jmusicbot.settings.SettingsManager;
 import com.jagrosh.jmusicbot.utils.FormatUtil;
 
 /**
@@ -30,12 +31,15 @@ public class SkipCmd extends MusicCommand
 {
     private static final String COMMAND_NAME = "skip";
 
-    public SkipCmd(Bot bot)
+    private SettingsManager settingsManager;
+
+    public SkipCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "votes to skip the current song";
         this.beListening = true;
         this.bePlaying = true;
+        this.settingsManager = SettingsManager.getInstance();
     }
 
     @Override
@@ -43,7 +47,7 @@ public class SkipCmd extends MusicCommand
     {
         AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
         RequestMetadata rm = handler.getRequestMetadata();
-        double skipRatio = bot.getSettingsManager().getSettings(event.getGuild()).getSkipRatio();
+        double skipRatio = settingsManager.getSettings(event.getGuild()).getSkipRatio();
         if(skipRatio == -1) {
           skipRatio = botConfig.getSkipRatio();
         }

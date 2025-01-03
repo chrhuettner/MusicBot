@@ -36,81 +36,33 @@ import net.dv8tion.jda.api.entities.Guild;
  */
 public class Bot
 {
-    private final EventWaiter waiter;
-    private final ScheduledExecutorService threadpool;
-    private final SettingsManager settings;
-    private final PlayerManager players;
-    private final PlaylistLoader playlists;
-    private final NowplayingHandler nowplaying;
-    private final AloneInVoiceHandler aloneInVoiceHandler;
-    
     private boolean shuttingDown = false;
     private JDA jda;
     private GUI gui;
-    
-    public Bot(EventWaiter waiter, SettingsManager settings)
-    {
-        this.waiter = waiter;
-        this.settings = settings;
-        this.playlists = new PlaylistLoader();
-        this.threadpool = Executors.newSingleThreadScheduledExecutor();
-        this.players = new PlayerManager(this);
-        this.players.init();
-        this.nowplaying = new NowplayingHandler(this);
-        this.nowplaying.init();
-        this.aloneInVoiceHandler = new AloneInVoiceHandler(this);
-        this.aloneInVoiceHandler.init();
-    }
-    public SettingsManager getSettingsManager()
-    {
-        return settings;
-    }
-    
-    public EventWaiter getWaiter()
-    {
-        return waiter;
-    }
-    
-    public ScheduledExecutorService getThreadpool()
-    {
-        return threadpool;
-    }
-    
-    public PlayerManager getPlayerManager()
-    {
-        return players;
-    }
-    
-    public PlaylistLoader getPlaylistLoader()
-    {
-        return playlists;
-    }
-    
-    public NowplayingHandler getNowplayingHandler()
-    {
-        return nowplaying;
-    }
 
-    public AloneInVoiceHandler getAloneInVoiceHandler()
-    {
-        return aloneInVoiceHandler;
+    private ScheduledExecutorService executorService;
+    private static Bot bot;
+
+    public static Bot getInstance(){
+        if(bot == null){
+            bot = new Bot();
+        }
+        return bot;
     }
-    
-    public JDA getJDA()
-    {
-        return jda;
+    private Bot() {
+        this.executorService = ScheduledExecutorServiceProvider.getInstance();
     }
     
     public void closeAudioConnection(long guildId)
     {
         Guild guild = jda.getGuildById(guildId);
         if(guild!=null)
-            threadpool.submit(() -> guild.getAudioManager().closeAudioConnection());
+            executorService.submit(() -> guild.getAudioManager().closeAudioConnection());
     }
     
     public void resetGame()
     {
-        BotConfig config = BotConfig.getBotConfig();
+        BotConfig config = BotConfig.getInstance();
         Activity game = config.getGame()==null || config.getGame().getName().equalsIgnoreCase("none") ? null : config.getGame();
         if(!Objects.equals(jda.getPresence().getActivity(), game))
             jda.getPresence().setActivity(game);
@@ -121,7 +73,7 @@ public class Bot
         if(shuttingDown)
             return;
         shuttingDown = true;
-        threadpool.shutdownNow();
+        executorService.shutdownNow();
         if(jda.getStatus()!=JDA.Status.SHUTTING_DOWN)
         {
             jda.getGuilds().stream().forEach(g -> 
@@ -136,18 +88,13 @@ public class Bot
             });
             jda.shutdown();
         }
-        if(gui!=null)
-            gui.dispose();
+        if(GUI.hasInstance())
+            GUI.getInstance().dispose();
         System.exit(0);
     }
 
     public void setJDA(JDA jda)
     {
         this.jda = jda;
-    }
-    
-    public void setGUI(GUI gui)
-    {
-        this.gui = gui;
     }
 }

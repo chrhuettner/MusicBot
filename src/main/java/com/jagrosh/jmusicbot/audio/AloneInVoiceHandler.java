@@ -17,6 +17,9 @@ package com.jagrosh.jmusicbot.audio;
 
 import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.BotConfig;
+import com.jagrosh.jmusicbot.JDAProvider;
+import com.jagrosh.jmusicbot.ScheduledExecutorServiceProvider;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
@@ -25,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,17 +43,32 @@ public class AloneInVoiceHandler
 
     private BotConfig botConfig;
 
-    public AloneInVoiceHandler(Bot bot)
+    private PlayerManager playerManager;
+
+    private ScheduledExecutorService executorService;
+    private static AloneInVoiceHandler aloneInVoiceHandler;
+
+    public static AloneInVoiceHandler getInstance(){
+        if(aloneInVoiceHandler == null){
+            aloneInVoiceHandler = new AloneInVoiceHandler();
+        }
+        return aloneInVoiceHandler;
+    }
+
+    private AloneInVoiceHandler()
     {
-        this.bot = bot;
-        this.botConfig = BotConfig.getBotConfig();
+        this.bot = Bot.getInstance();
+        this.botConfig = BotConfig.getInstance();
+        this.playerManager = PlayerManager.getInstance();
+        this.executorService = ScheduledExecutorServiceProvider.getInstance();
+        init();
     }
     
     public void init()
     {
         aloneTimeUntilStop = botConfig.getAloneTimeUntilStop();
         if(aloneTimeUntilStop > 0)
-            bot.getThreadpool().scheduleWithFixedDelay(() -> check(), 0, 5, TimeUnit.SECONDS);
+            executorService.scheduleWithFixedDelay(() -> check(), 0, 5, TimeUnit.SECONDS);
     }
     
     private void check()
@@ -59,7 +78,7 @@ public class AloneInVoiceHandler
         {
             if(entrySet.getValue().getEpochSecond() > Instant.now().getEpochSecond() - aloneTimeUntilStop) continue;
 
-            Guild guild = bot.getJDA().getGuildById(entrySet.getKey());
+            Guild guild = JDAProvider.getInstance().getGuildById(entrySet.getKey());
 
             if(guild == null)
             {
@@ -80,7 +99,7 @@ public class AloneInVoiceHandler
         if(aloneTimeUntilStop <= 0) return;
 
         Guild guild = event.getEntity().getGuild();
-        if(!bot.getPlayerManager().hasHandler(guild)) return;
+        if(!playerManager.hasHandler(guild)) return;
 
         boolean alone = isAlone(guild);
         boolean inList = aloneSince.containsKey(guild.getIdLong());

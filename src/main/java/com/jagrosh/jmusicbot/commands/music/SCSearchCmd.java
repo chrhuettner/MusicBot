@@ -25,9 +25,9 @@ public class SCSearchCmd extends SearchCmd
 {
     private static final String COMMAND_NAME = "scsearch";
 
-    public SCSearchCmd(Bot bot)
+    public SCSearchCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.searchPrefix = "scsearch:";
         this.help = "searches Soundcloud for a provided query";
     }

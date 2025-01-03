@@ -18,6 +18,7 @@ package com.jagrosh.jmusicbot.commands.dj;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
+import com.jagrosh.jmusicbot.audio.PlayerManager;
 import com.jagrosh.jmusicbot.audio.QueuedTrack;
 import com.jagrosh.jmusicbot.audio.RequestMetadata;
 import com.jagrosh.jmusicbot.commands.DJCommand;
@@ -39,14 +40,17 @@ public class PlaynextCmd extends DJCommand
 
     private static final String COMMAND_NAME = "playnext";
 
-    public PlaynextCmd(Bot bot)
+    private PlayerManager playerManager;
+
+    public PlaynextCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.loadingEmoji = botConfig.getLoading();
         this.arguments = "<title|URL>";
         this.help = "plays a single song next";
         this.beListening = true;
         this.bePlaying = false;
+        this.playerManager = PlayerManager.getInstance();
     }
     
     @Override
@@ -60,7 +64,7 @@ public class PlaynextCmd extends DJCommand
         String args = event.getArgs().startsWith("<") && event.getArgs().endsWith(">") 
                 ? event.getArgs().substring(1,event.getArgs().length()-1) 
                 : event.getArgs().isEmpty() ? event.getMessage().getAttachments().get(0).getUrl() : event.getArgs();
-        event.reply(loadingEmoji+" Loading... `["+args+"]`", m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), args, new ResultHandler(m,event,false)));
+        event.reply(loadingEmoji+" Loading... `["+args+"]`", m -> playerManager.loadItemOrdered(event.getGuild(), args, new ResultHandler(m,event,false)));
     }
 
 
@@ -117,7 +121,7 @@ public class PlaynextCmd extends DJCommand
             if(ytsearch)
                 m.editMessage(FormatUtil.filter(event.getClient().getWarning()+" No results found for `"+event.getArgs()+"`.")).queue();
             else
-                bot.getPlayerManager().loadItemOrdered(event.getGuild(), "ytsearch:"+event.getArgs(), new ResultHandler(m,event,true));
+                playerManager.loadItemOrdered(event.getGuild(), "ytsearch:"+event.getArgs(), new ResultHandler(m,event,true));
         }
 
         @Override

@@ -28,10 +28,10 @@ public class ShutdownCmd extends OwnerCommand
     private final Bot bot;
     private static final String COMMAND_NAME = "shutdown";
 
-    public ShutdownCmd(Bot bot)
+    public ShutdownCmd()
     {
         super(COMMAND_NAME);
-        this.bot = bot;
+        this.bot = Bot.getInstance();
         this.help = "safely shuts down";
         this.guildOnly = false;
     }

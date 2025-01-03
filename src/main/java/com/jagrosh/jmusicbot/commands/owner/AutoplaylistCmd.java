@@ -18,6 +18,7 @@ package com.jagrosh.jmusicbot.commands.owner;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.commands.OwnerCommand;
+import com.jagrosh.jmusicbot.playlist.PlaylistLoader;
 import com.jagrosh.jmusicbot.settings.Settings;
 
 /**
@@ -26,19 +27,19 @@ import com.jagrosh.jmusicbot.settings.Settings;
  */
 public class AutoplaylistCmd extends OwnerCommand
 {
-    private final Bot bot;
-
     private static final String COMMAND_NAME = "autoplaylist";
 
-    public AutoplaylistCmd(Bot bot)
+    private PlaylistLoader playlistLoader;
+
+    public AutoplaylistCmd()
     {
-        this(bot, COMMAND_NAME);
+        this(COMMAND_NAME);
+        this.playlistLoader = PlaylistLoader.getInstance();
     }
 
-    public AutoplaylistCmd(Bot bot, String name)
+    public AutoplaylistCmd(String name)
     {
         super(name);
-        this.bot = bot;
         this.guildOnly = true;
         this.arguments = "<name|NONE>";
         this.help = "sets the default playlist for the server";
@@ -60,7 +61,7 @@ public class AutoplaylistCmd extends OwnerCommand
             return;
         }
         String pname = event.getArgs().replaceAll("\\s+", "_");
-        if(bot.getPlaylistLoader().getPlaylist(pname)==null)
+        if(playlistLoader.getPlaylist(pname)==null)
         {
             event.reply(event.getClient().getError()+" Could not find `"+pname+".txt`!");
         }

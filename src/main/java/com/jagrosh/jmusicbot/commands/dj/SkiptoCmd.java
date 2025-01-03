@@ -28,9 +28,9 @@ public class SkiptoCmd extends DJCommand
 {
     private static final String COMMAND_NAME = "skipto";
 
-    public SkiptoCmd(Bot bot)
+    public SkiptoCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "skips to the specified song";
         this.arguments = "<position>";
         this.bePlaying = true;

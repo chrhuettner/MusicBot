@@ -28,9 +28,9 @@ public class StopCmd extends DJCommand
 {
     private static final String COMMAND_NAME = "stop";
 
-    public StopCmd(Bot bot)
+    public StopCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "stops the current song and clears the queue";
         this.bePlaying = false;
     }

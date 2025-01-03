@@ -28,9 +28,9 @@ public class ShuffleCmd extends MusicCommand
 {
     private static final String COMMAND_NAME = "shuffle";
 
-    public ShuffleCmd(Bot bot)
+    public ShuffleCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "shuffles songs you have added";
         this.beListening = true;
         this.bePlaying = true;

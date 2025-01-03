@@ -15,6 +15,8 @@
  */
 package com.jagrosh.jmusicbot.commands.music;
 
+import com.jagrosh.jmusicbot.EventWaiterProvider;
+import com.jagrosh.jmusicbot.audio.PlayerManager;
 import com.jagrosh.jmusicbot.audio.RequestMetadata;
 import com.jagrosh.jmusicbot.utils.TimeUtil;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -45,14 +47,16 @@ public class SearchCmd extends MusicCommand
 
     private static final String COMMAND_NAME = "search";
 
-    public SearchCmd(Bot bot)
+    private PlayerManager playerManager;
+
+    public SearchCmd()
     {
-       this(COMMAND_NAME, bot);
+       this(COMMAND_NAME);
     }
 
-    public SearchCmd(String commandName, Bot bot)
+    public SearchCmd(String commandName)
     {
-        super(commandName, bot);
+        super(commandName);
         this.searchingEmoji = botConfig.getSearching();
         this.arguments = "<query>";
         this.help = "searches Youtube for a provided query";
@@ -63,8 +67,9 @@ public class SearchCmd extends MusicCommand
                 .allowTextInput(true)
                 .useNumbers()
                 .useCancelButton(true)
-                .setEventWaiter(bot.getWaiter())
+                .setEventWaiter(EventWaiterProvider.getInstance())
                 .setTimeout(1, TimeUnit.MINUTES);
+        this.playerManager = PlayerManager.getInstance();
     }
     @Override
     public void doCommand(CommandEvent event) 
@@ -75,7 +80,7 @@ public class SearchCmd extends MusicCommand
             return;
         }
         event.reply(searchingEmoji+" Searching... `["+event.getArgs()+"]`", 
-                m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), searchPrefix + event.getArgs(), new ResultHandler(m,event)));
+                m -> playerManager.loadItemOrdered(event.getGuild(), searchPrefix + event.getArgs(), new ResultHandler(m,event)));
     }
 
 

@@ -30,12 +30,22 @@ import com.jagrosh.jmusicbot.Bot;
 public class GUI extends JFrame 
 {
     private final ConsolePanel console;
-    private final Bot bot;
-    
-    public GUI(Bot bot) 
+
+    private static GUI gui;
+
+    public static GUI getInstance(){
+        if(gui == null){
+            gui = new GUI();
+        }
+        return gui;
+    }
+
+    public static boolean hasInstance(){
+        return gui != null;
+    }
+    private GUI()
     {
         super();
-        this.bot = bot;
         console = new ConsolePanel();
     }
     
@@ -56,7 +66,7 @@ public class GUI extends JFrame
             {
                 try
                 {
-                    bot.shutdown();
+                    Bot.getInstance().shutdown();
                 }
                 catch(Exception ex)
                 {

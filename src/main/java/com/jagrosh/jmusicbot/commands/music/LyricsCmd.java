@@ -33,9 +33,9 @@ public class LyricsCmd extends MusicCommand
 
     private static final String COMMAND_NAME = "lyrics";
 
-    public LyricsCmd(Bot bot)
+    public LyricsCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.arguments = "[song name]";
         this.help = "shows the lyrics of a song";
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};

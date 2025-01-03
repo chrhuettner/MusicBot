@@ -37,9 +37,17 @@ public class PlaylistLoader
 {
     private final BotConfig config;
     
-    public PlaylistLoader()
+    private PlaylistLoader()
     {
-        this.config = BotConfig.getBotConfig();
+        this.config = BotConfig.getInstance();
+    }
+
+    private static PlaylistLoader playlistLoader;
+    public static PlaylistLoader getInstance(){
+        if(playlistLoader == null){
+            playlistLoader = new PlaylistLoader();
+        }
+        return playlistLoader;
     }
     
     public List<String> getPlaylistNames()

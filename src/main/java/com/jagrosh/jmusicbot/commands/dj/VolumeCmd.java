@@ -30,9 +30,9 @@ public class VolumeCmd extends DJCommand
 {
     private static final String COMMAND_NAME = "volume";
 
-    public VolumeCmd(Bot bot)
+    public VolumeCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "sets or shows volume";
         this.arguments = "[0-150]";
     }

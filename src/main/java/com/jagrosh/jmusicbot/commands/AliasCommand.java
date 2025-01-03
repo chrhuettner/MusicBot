@@ -8,7 +8,7 @@ public abstract class AliasCommand extends Command {
     protected BotConfig botConfig;
 
     public AliasCommand(String commandName) {
-        this.botConfig = BotConfig.getBotConfig();
+        this.botConfig = BotConfig.getInstance();
         this.name = commandName;
         this.aliases = botConfig.getAliases(name);
     }

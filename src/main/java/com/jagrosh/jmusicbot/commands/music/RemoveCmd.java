@@ -32,9 +32,9 @@ public class RemoveCmd extends MusicCommand
 {
     private static final String COMMAND_NAME = "remove";
 
-    public RemoveCmd(Bot bot)
+    public RemoveCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "removes a song from the queue";
         this.arguments = "<position|ALL>";
         this.beListening = true;

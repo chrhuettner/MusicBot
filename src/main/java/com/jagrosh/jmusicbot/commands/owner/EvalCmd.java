@@ -35,12 +35,12 @@ public class EvalCmd extends OwnerCommand
     private static final String COMMAND_NAME = "eval";
 
 
-    public EvalCmd(Bot bot)
+    public EvalCmd()
     {
         super(COMMAND_NAME);
-        this.bot = bot;
+        this.bot = Bot.getInstance();
         this.help = "evaluates nashorn code";
-        this.engine = BotConfig.getBotConfig().getEvalEngine();
+        this.engine = BotConfig.getInstance().getEvalEngine();
         this.guildOnly = false;
     }
     

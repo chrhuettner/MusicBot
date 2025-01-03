@@ -29,9 +29,9 @@ public class RepeatCmd extends DJCommand
 {
     private static final String COMMAND_NAME = "repeat";
 
-    public RepeatCmd(Bot bot)
+    public RepeatCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "re-adds music to the queue when finished";
         this.arguments = "[off|all|single]";
         this.guildOnly = true;

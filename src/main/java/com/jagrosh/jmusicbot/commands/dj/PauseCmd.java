@@ -28,9 +28,9 @@ public class PauseCmd extends DJCommand
 {
     private static final String COMMAND_NAME = "pause";
 
-    public PauseCmd(Bot bot)
+    public PauseCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "pauses the current song";
         this.bePlaying = true;
     }

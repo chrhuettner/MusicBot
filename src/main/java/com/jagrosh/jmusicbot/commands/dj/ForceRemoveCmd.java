@@ -19,6 +19,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.jdautilities.menu.OrderedMenu;
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.EventWaiterProvider;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.commands.DJCommand;
 import com.jagrosh.jmusicbot.utils.FormatUtil;
@@ -37,9 +38,9 @@ public class ForceRemoveCmd extends DJCommand
 {
     private static final String COMMAND_NAME = "forceremove";
 
-    public ForceRemoveCmd(Bot bot)
+    public ForceRemoveCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "removes all entries by a user from the queue";
         this.arguments = "<user>";
         this.beListening = false;
@@ -89,7 +90,7 @@ public class ForceRemoveCmd extends DJCommand
             .setUsers(event.getAuthor())
             .useCancelButton(true)
             .setCancel((msg) -> {})
-            .setEventWaiter(bot.getWaiter())
+            .setEventWaiter(EventWaiterProvider.getInstance())
             .setTimeout(1, TimeUnit.MINUTES)
 
             .build().display(event.getChannel());

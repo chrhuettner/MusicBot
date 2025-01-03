@@ -17,6 +17,7 @@ package com.jagrosh.jmusicbot.commands;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.audio.PlayerManager;
 import com.jagrosh.jmusicbot.settings.Settings;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -33,13 +34,15 @@ public abstract class MusicCommand extends AliasCommand
     protected final Bot bot;
     protected boolean bePlaying;
     protected boolean beListening;
+    protected PlayerManager playerManager;
 
-    public MusicCommand(String commandName, Bot bot)
+    public MusicCommand(String commandName)
     {
         super(commandName);
-        this.bot = bot;
+        this.bot = Bot.getInstance();
         this.guildOnly = true;
         this.category = new Category("Music");
+        this.playerManager = PlayerManager.getInstance();
     }
 
     @Override
@@ -47,7 +50,7 @@ public abstract class MusicCommand extends AliasCommand
         Settings settings = event.getClient().getSettingsFor(event.getGuild());
         if (!isCommandInAllowedChannel(event, settings)) return;
 
-        bot.getPlayerManager().setUpHandler(event.getGuild());
+       playerManager.setUpHandler(event.getGuild());
 
         if (bePlaying && !isMusicPlaying(event)) {
             event.reply(event.getClient().getError() + " There must be music playing to use that!");

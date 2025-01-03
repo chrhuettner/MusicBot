@@ -15,8 +15,13 @@
  */
 package com.jagrosh.jmusicbot;
 
+import com.jagrosh.jmusicbot.audio.AloneInVoiceHandler;
+import com.jagrosh.jmusicbot.audio.NowplayingHandler;
+import com.jagrosh.jmusicbot.audio.PlayerManager;
+import com.jagrosh.jmusicbot.settings.SettingsManager;
 import com.jagrosh.jmusicbot.utils.OtherUtil;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.JDA;
@@ -37,19 +42,35 @@ import org.slf4j.LoggerFactory;
  * @author John Grosh (john.a.grosh@gmail.com)
  */
 public class Listener extends ListenerAdapter {
-    private final Bot bot;
 
     private BotConfig config;
 
-    public Listener(Bot bot) {
-        this.bot = bot;
-        this.config = BotConfig.getBotConfig();
+    private SettingsManager settingsManager;
+
+    private NowplayingHandler nowplayingHandler;
+
+    private AloneInVoiceHandler aloneInVoiceHandler;
+
+    private PlayerManager playerManager;
+
+    private ScheduledExecutorService executorService;
+
+    private Bot bot;
+
+    public Listener() {
+        this.bot = Bot.getInstance();
+        this.config = BotConfig.getInstance();
+        this.settingsManager = SettingsManager.getInstance();
+        this.nowplayingHandler = NowplayingHandler.getInstance();
+        this.aloneInVoiceHandler = AloneInVoiceHandler.getInstance();
+        this.playerManager = PlayerManager.getInstance();
+        this.executorService = ScheduledExecutorServiceProvider.getInstance();
     }
 
     @Override
     public void onReady(ReadyEvent event) {
         checkGuilds(event);
-        credit(event.getJDA());
+        credit();
         processGuilds(event);
         scheduleUpdateAlerts();
     }
@@ -58,16 +79,16 @@ public class Listener extends ListenerAdapter {
         if (event.getJDA().getGuildCache().isEmpty()) {
             Logger log = LoggerFactory.getLogger("MusicBot");
             log.warn("This bot is not on any guilds! Use the following link to add the bot to your guilds!");
-            log.warn(event.getJDA().getInviteUrl(JMusicBot.RECOMMENDED_PERMS));
+            log.warn(event.getJDA().getInviteUrl(JDAProvider.getRecommendedPermissions()));
         }
     }
 
     private void processGuilds(ReadyEvent event) {
         event.getJDA().getGuilds().forEach(guild -> {
             try {
-                String defpl = bot.getSettingsManager().getSettings(guild).getDefaultPlaylist();
-                VoiceChannel vc = bot.getSettingsManager().getSettings(guild).getVoiceChannel(guild);
-                if (defpl != null && vc != null && bot.getPlayerManager().setUpHandler(guild).playFromDefault()) {
+                String defpl = settingsManager.getSettings(guild).getDefaultPlaylist();
+                VoiceChannel vc = settingsManager.getSettings(guild).getVoiceChannel(guild);
+                if (defpl != null && vc != null && playerManager.setUpHandler(guild).playFromDefault()) {
                     guild.getAudioManager().openAudioConnection(vc);
                 }
             } catch (Exception ignore) {
@@ -77,9 +98,9 @@ public class Listener extends ListenerAdapter {
 
     private void scheduleUpdateAlerts() {
         if (config.useUpdateAlerts()) {
-            bot.getThreadpool().scheduleWithFixedDelay(() -> {
+            executorService.scheduleWithFixedDelay(() -> {
                 try {
-                    User owner = bot.getJDA().retrieveUserById(config.getOwnerId()).complete();
+                    User owner = JDAProvider.getInstance().retrieveUserById(config.getOwnerId()).complete();
                     String currentVersion = OtherUtil.getCurrentVersion();
                     String latestVersion = OtherUtil.getLatestVersion();
                     if (latestVersion != null && !currentVersion.equalsIgnoreCase(latestVersion)) {
@@ -94,12 +115,12 @@ public class Listener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
-        bot.getNowplayingHandler().onMessageDelete(event.getGuild(), event.getMessageIdLong());
+        nowplayingHandler.onMessageDelete(event.getGuild(), event.getMessageIdLong());
     }
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
-        bot.getAloneInVoiceHandler().onVoiceUpdate(event);
+        aloneInVoiceHandler.onVoiceUpdate(event);
     }
 
     @Override
@@ -109,11 +130,13 @@ public class Listener extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(GuildJoinEvent event) {
-        credit(event.getJDA());
+        credit();
     }
 
     // make sure people aren't adding clones to dbots
-    private void credit(JDA jda) {
+    private void credit() {
+        JDA jda = JDAProvider.getInstance();
+
         Guild dbots = jda.getGuildById(110373943822540800L);
         if (dbots == null)
             return;

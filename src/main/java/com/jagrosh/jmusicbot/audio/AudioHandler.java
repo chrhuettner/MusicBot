@@ -15,10 +15,13 @@
  */
 package com.jagrosh.jmusicbot.audio;
 
+import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.BotConfig;
+import com.jagrosh.jmusicbot.playlist.PlaylistLoader;
 import com.jagrosh.jmusicbot.playlist.PlaylistLoader.Playlist;
 import com.jagrosh.jmusicbot.queue.AbstractQueue;
 import com.jagrosh.jmusicbot.settings.QueueType;
+import com.jagrosh.jmusicbot.settings.SettingsManager;
 import com.jagrosh.jmusicbot.utils.TimeUtil;
 import com.jagrosh.jmusicbot.settings.RepeatMode;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -67,14 +70,26 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
 
     private BotConfig botConfig;
 
+    private SettingsManager settingsManager;
+
+    private PlaylistLoader playlistLoader;
+
+    private Bot bot;
+
+    private NowplayingHandler nowplayingHandler;
+
     protected AudioHandler(PlayerManager manager, Guild guild, AudioPlayer player)
     {
         this.manager = manager;
         this.audioPlayer = player;
         this.guildId = guild.getIdLong();
-        this.botConfig = BotConfig.getBotConfig();
+        this.botConfig = BotConfig.getInstance();
+        this.settingsManager = SettingsManager.getInstance();
+        this.playlistLoader = PlaylistLoader.getInstance();
+        this.bot = Bot.getInstance();
+        this.nowplayingHandler = NowplayingHandler.getInstance();
 
-        this.setQueueType(manager.getBot().getSettingsManager().getSettings(guildId).getQueueType());
+        this.setQueueType(settingsManager.getSettings(guildId).getQueueType());
     }
 
     public void setQueueType(QueueType type)
@@ -150,11 +165,11 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
             audioPlayer.playTrack(defaultQueue.remove(0));
             return true;
         }
-        Settings settings = manager.getBot().getSettingsManager().getSettings(guildId);
+        Settings settings = settingsManager.getSettings(guildId);
         if(settings==null || settings.getDefaultPlaylist()==null)
             return false;
         
-        Playlist pl = manager.getBot().getPlaylistLoader().getPlaylist(settings.getDefaultPlaylist());
+        Playlist pl = playlistLoader.getPlaylist(settings.getDefaultPlaylist());
         if(pl==null || pl.getItems().isEmpty())
             return false;
         pl.loadTracks(manager, (at) -> 
@@ -166,7 +181,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
         }, () -> 
         {
             if(pl.getTracks().isEmpty() && !botConfig.getStay())
-                manager.getBot().closeAudioConnection(guildId);
+                bot.closeAudioConnection(guildId);
         });
         return true;
     }
@@ -175,7 +190,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) 
     {
-        RepeatMode repeatMode = manager.getBot().getSettingsManager().getSettings(guildId).getRepeatMode();
+        RepeatMode repeatMode = settingsManager.getSettings(guildId).getRepeatMode();
         // if the track ended normally, and we're in repeat mode, re-add it to the queue
         if(endReason==AudioTrackEndReason.FINISHED && repeatMode != RepeatMode.OFF)
         {
@@ -190,9 +205,9 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
         {
             if(!playFromDefault())
             {
-                manager.getBot().getNowplayingHandler().onTrackUpdate(null);
+               nowplayingHandler.onTrackUpdate(null);
                 if(!botConfig.getStay())
-                    manager.getBot().closeAudioConnection(guildId);
+                   bot.closeAudioConnection(guildId);
                 // unpause, in the case when the player was paused and the track has been skipped.
                 // this is to prevent the player being paused next time it's being used.
                 player.setPaused(false);
@@ -214,7 +229,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
     public void onTrackStart(AudioPlayer player, AudioTrack track) 
     {
         votes.clear();
-        manager.getBot().getNowplayingHandler().onTrackUpdate(track);
+        nowplayingHandler.onTrackUpdate(track);
     }
 
     

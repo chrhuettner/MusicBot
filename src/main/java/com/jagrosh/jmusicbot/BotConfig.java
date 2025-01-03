@@ -59,7 +59,7 @@ public class BotConfig
         this.prompt = prompt;
     }
 
-    public static BotConfig getBotConfig(){
+    public static BotConfig getInstance(){
         if(botConfig == null){
             throw new RuntimeException("Bot config was not initialized at startup!");
         }

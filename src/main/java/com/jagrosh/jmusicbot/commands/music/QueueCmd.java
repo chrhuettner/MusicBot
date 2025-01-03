@@ -20,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.menu.Paginator;
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.EventWaiterProvider;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
+import com.jagrosh.jmusicbot.audio.NowplayingHandler;
 import com.jagrosh.jmusicbot.audio.QueuedTrack;
 import com.jagrosh.jmusicbot.commands.MusicCommand;
 import com.jagrosh.jmusicbot.settings.QueueType;
@@ -43,9 +45,11 @@ public class QueueCmd extends MusicCommand
 
     private static final String COMMAND_NAME = "queue";
 
-    public QueueCmd(Bot bot)
+    private NowplayingHandler nowplayingHandler;
+
+    public QueueCmd()
     {
-        super(COMMAND_NAME, bot);
+        super(COMMAND_NAME);
         this.help = "shows the current queue";
         this.arguments = "[pagenum]";
         this.bePlaying = true;
@@ -58,8 +62,9 @@ public class QueueCmd extends MusicCommand
                 .useNumberedItems(true)
                 .showPageNumbers(true)
                 .wrapPageEnds(true)
-                .setEventWaiter(bot.getWaiter())
+                .setEventWaiter(EventWaiterProvider.getInstance())
                 .setTimeout(1, TimeUnit.MINUTES);
+        this.nowplayingHandler = NowplayingHandler.getInstance();
     }
 
     @Override
@@ -92,7 +97,7 @@ public class QueueCmd extends MusicCommand
                 .setEmbeds((nowp == null ? nonowp : nowp).getEmbeds().get(0)).build();
         event.reply(built, m -> {
             if (nowp != null)
-                bot.getNowplayingHandler().setLastNPMessage(m);
+                nowplayingHandler.setLastNPMessage(m);
         });
     }
 

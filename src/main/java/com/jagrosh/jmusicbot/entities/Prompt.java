@@ -32,13 +32,21 @@ public class Prompt
     private boolean nogui;
     private boolean noprompt;
     private Scanner scanner;
-    
-    public Prompt(String title)
+
+    private static Prompt prompt;
+
+    public static Prompt getInstance(){
+        if(prompt == null){
+            prompt = new Prompt("JMusicBot");
+        }
+        return prompt;
+    }
+    private Prompt(String title)
     {
         this(title, null);
     }
-    
-    public Prompt(String title, String noguiMessage)
+
+    private Prompt(String title, String noguiMessage)
     {
         this(title, noguiMessage, "true".equalsIgnoreCase(System.getProperty("nogui")), "true".equalsIgnoreCase(System.getProperty("noprompt")));
     }

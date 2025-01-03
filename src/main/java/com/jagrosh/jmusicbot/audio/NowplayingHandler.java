@@ -17,12 +17,17 @@ package com.jagrosh.jmusicbot.audio;
 
 import com.jagrosh.jmusicbot.Bot;
 import com.jagrosh.jmusicbot.BotConfig;
+import com.jagrosh.jmusicbot.JDAProvider;
+import com.jagrosh.jmusicbot.ScheduledExecutorServiceProvider;
 import com.jagrosh.jmusicbot.entities.Pair;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -38,18 +43,30 @@ public class NowplayingHandler
     private final HashMap<Long,Pair<Long,Long>> lastNP; // guild -> channel,message
 
     private BotConfig botConfig;
-    
-    public NowplayingHandler(Bot bot)
+
+    private ScheduledExecutorService executorService;
+
+    private static NowplayingHandler nowplayingHandler;
+
+    public static NowplayingHandler getInstance(){
+        if(nowplayingHandler == null){
+            nowplayingHandler = new NowplayingHandler();
+        }
+        return nowplayingHandler;
+    }
+    private NowplayingHandler()
     {
-        this.bot = bot;
+        this.bot = Bot.getInstance();
         this.lastNP = new HashMap<>();
-        this.botConfig = BotConfig.getBotConfig();
+        this.botConfig = BotConfig.getInstance();
+        this.executorService = ScheduledExecutorServiceProvider.getInstance();
+        init();
     }
     
     public void init()
     {
         if(!botConfig.useNPImages())
-            bot.getThreadpool().scheduleWithFixedDelay(() -> updateAll(), 0, 5, TimeUnit.SECONDS);
+            executorService.scheduleWithFixedDelay(() -> updateAll(), 0, 5, TimeUnit.SECONDS);
     }
     
     public void setLastNPMessage(Message m)
@@ -65,9 +82,10 @@ public class NowplayingHandler
     private void updateAll()
     {
         Set<Long> toRemove = new HashSet<>();
+        JDA jda = JDAProvider.getInstance();
         for(long guildId: lastNP.keySet())
         {
-            Guild guild = bot.getJDA().getGuildById(guildId);
+            Guild guild = jda.getGuildById(guildId);
             if(guild==null)
             {
                 toRemove.add(guildId);
@@ -81,10 +99,10 @@ public class NowplayingHandler
                 continue;
             }
             AudioHandler handler = (AudioHandler)guild.getAudioManager().getSendingHandler();
-            Message msg = handler.getNowPlaying(bot.getJDA());
+            Message msg = handler.getNowPlaying(jda);
             if(msg==null)
             {
-                msg = handler.getNoMusicPlaying(bot.getJDA());
+                msg = handler.getNoMusicPlaying(jda);
                 toRemove.add(guildId);
             }
             try 
@@ -102,11 +120,13 @@ public class NowplayingHandler
     // "event"-based methods
     public void onTrackUpdate(AudioTrack track)
     {
+        JDA jda = JDAProvider.getInstance();
+
         // update bot status if applicable
         if(botConfig.getSongInStatus())
         {
-            if(track!=null && bot.getJDA().getGuilds().stream().filter(g -> g.getSelfMember().getVoiceState().inVoiceChannel()).count()<=1)
-                bot.getJDA().getPresence().setActivity(Activity.listening(track.getInfo().title));
+            if(track!=null && jda.getGuilds().stream().filter(g -> g.getSelfMember().getVoiceState().inVoiceChannel()).count()<=1)
+                jda.getPresence().setActivity(Activity.listening(track.getInfo().title));
             else
                 bot.resetGame();
         }
