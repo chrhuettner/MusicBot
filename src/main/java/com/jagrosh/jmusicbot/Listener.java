@@ -43,46 +43,47 @@ public class Listener extends ListenerAdapter
     {
         this.bot = bot;
     }
-    
+
     @Override
-    public void onReady(ReadyEvent event) 
-    {
-        if(event.getJDA().getGuildCache().isEmpty())
-        {
+    public void onReady(ReadyEvent event) {
+        checkGuilds(event);
+        credit(event.getJDA());
+        processGuilds(event);
+        scheduleUpdateAlerts();
+    }
+
+    private void checkGuilds(ReadyEvent event) {
+        if (event.getJDA().getGuildCache().isEmpty()) {
             Logger log = LoggerFactory.getLogger("MusicBot");
             log.warn("This bot is not on any guilds! Use the following link to add the bot to your guilds!");
             log.warn(event.getJDA().getInviteUrl(JMusicBot.RECOMMENDED_PERMS));
         }
-        credit(event.getJDA());
-        event.getJDA().getGuilds().forEach((guild) -> 
-        {
-            try
-            {
+    }
+
+    private void processGuilds(ReadyEvent event) {
+        event.getJDA().getGuilds().forEach(guild -> {
+            try {
                 String defpl = bot.getSettingsManager().getSettings(guild).getDefaultPlaylist();
                 VoiceChannel vc = bot.getSettingsManager().getSettings(guild).getVoiceChannel(guild);
-                if(defpl!=null && vc!=null && bot.getPlayerManager().setUpHandler(guild).playFromDefault())
-                {
+                if (defpl != null && vc != null && bot.getPlayerManager().setUpHandler(guild).playFromDefault()) {
                     guild.getAudioManager().openAudioConnection(vc);
                 }
-            }
-            catch(Exception ignore) {}
+            } catch (Exception ignore) {}
         });
-        if(bot.getConfig().useUpdateAlerts())
-        {
-            bot.getThreadpool().scheduleWithFixedDelay(() -> 
-            {
-                try
-                {
+    }
+
+    private void scheduleUpdateAlerts() {
+        if (bot.getConfig().useUpdateAlerts()) {
+            bot.getThreadpool().scheduleWithFixedDelay(() -> {
+                try {
                     User owner = bot.getJDA().retrieveUserById(bot.getConfig().getOwnerId()).complete();
                     String currentVersion = OtherUtil.getCurrentVersion();
                     String latestVersion = OtherUtil.getLatestVersion();
-                    if(latestVersion!=null && !currentVersion.equalsIgnoreCase(latestVersion))
-                    {
+                    if (latestVersion != null && !currentVersion.equalsIgnoreCase(latestVersion)) {
                         String msg = String.format(OtherUtil.NEW_VERSION_AVAILABLE, currentVersion, latestVersion);
                         owner.openPrivateChannel().queue(pc -> pc.sendMessage(msg).queue());
                     }
-                }
-                catch(Exception ignored) {} // ignored
+                } catch (Exception ignored) {}
             }, 0, 24, TimeUnit.HOURS);
         }
     }
