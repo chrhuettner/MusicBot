@@ -171,18 +171,24 @@ public class JMusicBot
         System.exit(1);
     }
 
-    
-    private static CommandClient createCommandClient(BotConfig config, SettingsManager settings, Bot bot)
-    {
-        // instantiate about command
+
+    private static CommandClient createCommandClient(BotConfig config, SettingsManager settings, Bot bot) {
+        AboutCommand aboutCommand = createAboutCommand();
+        CommandClientBuilder cb = setupCommandClient(config, settings, bot, aboutCommand);
+        return cb.build();
+    }
+
+    private static AboutCommand createAboutCommand() {
         AboutCommand aboutCommand = new AboutCommand(Color.BLUE.brighter(),
-                                "a music bot that is [easy to host yourself!](https://github.com/jagrosh/MusicBot) (v" + OtherUtil.getCurrentVersion() + ")",
-                                new String[]{"High-quality music playback", "FairQueue™ Technology", "Easy to host yourself"},
-                                RECOMMENDED_PERMS);
+                "a music bot that is [easy to host yourself!](https://github.com/jagrosh/MusicBot) (v" + OtherUtil.getCurrentVersion() + ")",
+                new String[]{"High-quality music playback", "FairQueue™ Technology", "Easy to host yourself"},
+                RECOMMENDED_PERMS);
         aboutCommand.setIsAuthor(false);
         aboutCommand.setReplacementCharacter("\uD83C\uDFB6"); // 🎶
-        
-        // set up the command client
+        return aboutCommand;
+    }
+
+    private static CommandClientBuilder setupCommandClient(BotConfig config, SettingsManager settings, Bot bot, AboutCommand aboutCommand) {
         CommandClientBuilder cb = new CommandClientBuilder()
                 .setPrefix(config.getPrefix())
                 .setAlternativePrefix(config.getAltPrefix())
@@ -191,65 +197,23 @@ public class JMusicBot
                 .setHelpWord(config.getHelp())
                 .setLinkedCacheSize(200)
                 .setGuildSettingsManager(settings)
-                .addCommands(aboutCommand,
-                        new PingCommand(),
-                        new SettingsCmd(bot),
-                        
-                        new LyricsCmd(bot),
-                        new NowplayingCmd(bot),
-                        new PlayCmd(bot),
-                        new PlaylistsCmd(bot),
-                        new QueueCmd(bot),
-                        new RemoveCmd(bot),
-                        new SearchCmd(bot),
-                        new SCSearchCmd(bot),
-                        new SeekCmd(bot),
-                        new ShuffleCmd(bot),
-                        new SkipCmd(bot),
+                .addCommands(aboutCommand, new PingCommand(), new SettingsCmd(bot),
+                        new LyricsCmd(bot), new NowplayingCmd(bot), new PlayCmd(bot), new PlaylistsCmd(bot), new QueueCmd(bot), new RemoveCmd(bot),
+                        new SearchCmd(bot), new SCSearchCmd(bot), new SeekCmd(bot), new ShuffleCmd(bot), new SkipCmd(bot),
+                        new ForceRemoveCmd(bot), new ForceskipCmd(bot), new MoveTrackCmd(bot), new PauseCmd(bot),
+                        new PlaynextCmd(bot), new RepeatCmd(bot), new SkiptoCmd(bot), new StopCmd(bot), new VolumeCmd(bot),
+                        new PrefixCmd(bot), new QueueTypeCmd(bot), new SetdjCmd(bot), new SkipratioCmd(bot),
+                        new SettcCmd(bot), new SetvcCmd(bot),
+                        new AutoplaylistCmd(bot), new DebugCmd(bot), new PlaylistCmd(bot),
+                        new SetavatarCmd(bot), new SetgameCmd(bot), new SetnameCmd(bot), new SetstatusCmd(bot), new ShutdownCmd(bot));
 
-                        new ForceRemoveCmd(bot),
-                        new ForceskipCmd(bot),
-                        new MoveTrackCmd(bot),
-                        new PauseCmd(bot),
-                        new PlaynextCmd(bot),
-                        new RepeatCmd(bot),
-                        new SkiptoCmd(bot),
-                        new StopCmd(bot),
-                        new VolumeCmd(bot),
-                        
-                        new PrefixCmd(bot),
-                        new QueueTypeCmd(bot),
-                        new SetdjCmd(bot),
-                        new SkipratioCmd(bot),
-                        new SettcCmd(bot),
-                        new SetvcCmd(bot),
+        if (config.useEval()) cb.addCommand(new EvalCmd(bot));
+        if (config.getStatus() != OnlineStatus.UNKNOWN) cb.setStatus(config.getStatus());
+        if (config.getGame() == null) cb.useDefaultGame();
+        else if (config.isGameNone()) cb.setActivity(null);
+        else cb.setActivity(config.getGame());
 
-                        new AutoplaylistCmd(bot),
-                        new DebugCmd(bot),
-                        new PlaylistCmd(bot),
-                        new SetavatarCmd(bot),
-                        new SetgameCmd(bot),
-                        new SetnameCmd(bot),
-                        new SetstatusCmd(bot),
-                        new ShutdownCmd(bot)
-                );
-        
-        // enable eval if applicable
-        if(config.useEval())
-            cb.addCommand(new EvalCmd(bot));
-        
-        // set status if set in config
-        if(config.getStatus() != OnlineStatus.UNKNOWN)
-            cb.setStatus(config.getStatus());
-        
-        // set game
-        if(config.getGame() == null)
-            cb.useDefaultGame();
-        else if(config.isGameNone())
-            cb.setActivity(null);
-        else
-            cb.setActivity(config.getGame());
-        
-        return cb.build();
+        return cb;
     }
+
 }
