@@ -26,13 +26,13 @@ import com.jagrosh.jmusicbot.commands.DJCommand;
  */
 public class SkiptoCmd extends DJCommand 
 {
+    private static final String COMMAND_NAME = "skipto";
+
     public SkiptoCmd(Bot bot)
     {
         super(bot);
-        this.name = "skipto";
         this.help = "skips to the specified song";
         this.arguments = "<position>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.bePlaying = true;
     }
 
@@ -58,5 +58,10 @@ public class SkiptoCmd extends DJCommand
         handler.getQueue().skip(index-1);
         event.reply(event.getClient().getSuccess()+" Skipped to **"+handler.getQueue().get(0).getTrack().getInfo().title+"**");
         handler.getPlayer().stopTrack();
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

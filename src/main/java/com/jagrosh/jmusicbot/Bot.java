@@ -38,7 +38,6 @@ public class Bot
 {
     private final EventWaiter waiter;
     private final ScheduledExecutorService threadpool;
-    private final BotConfig config;
     private final SettingsManager settings;
     private final PlayerManager players;
     private final PlaylistLoader playlists;
@@ -49,12 +48,11 @@ public class Bot
     private JDA jda;
     private GUI gui;
     
-    public Bot(EventWaiter waiter, BotConfig config, SettingsManager settings)
+    public Bot(EventWaiter waiter, SettingsManager settings)
     {
         this.waiter = waiter;
-        this.config = config;
         this.settings = settings;
-        this.playlists = new PlaylistLoader(config);
+        this.playlists = new PlaylistLoader();
         this.threadpool = Executors.newSingleThreadScheduledExecutor();
         this.players = new PlayerManager(this);
         this.players.init();
@@ -63,12 +61,6 @@ public class Bot
         this.aloneInVoiceHandler = new AloneInVoiceHandler(this);
         this.aloneInVoiceHandler.init();
     }
-    
-    public BotConfig getConfig()
-    {
-        return config;
-    }
-    
     public SettingsManager getSettingsManager()
     {
         return settings;
@@ -118,6 +110,7 @@ public class Bot
     
     public void resetGame()
     {
+        BotConfig config = BotConfig.getBotConfig();
         Activity game = config.getGame()==null || config.getGame().getName().equalsIgnoreCase("none") ? null : config.getGame();
         if(!Objects.equals(jda.getPresence().getActivity(), game))
             jda.getPresence().setActivity(game);

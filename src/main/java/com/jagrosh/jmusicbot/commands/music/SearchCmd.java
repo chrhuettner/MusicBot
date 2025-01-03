@@ -42,13 +42,13 @@ public class SearchCmd extends MusicCommand
     protected String searchPrefix = "ytsearch:";
     private final OrderedMenu.Builder builder;
     private final String searchingEmoji;
-    
+
+    private static final String COMMAND_NAME = "search";
+
     public SearchCmd(Bot bot)
     {
         super(bot);
-        this.searchingEmoji = bot.getConfig().getSearching();
-        this.name = "search";
-        this.aliases = bot.getConfig().getAliases(this.name);
+        this.searchingEmoji = botConfig.getSearching();
         this.arguments = "<query>";
         this.help = "searches Youtube for a provided query";
         this.beListening = true;
@@ -72,7 +72,12 @@ public class SearchCmd extends MusicCommand
         event.reply(searchingEmoji+" Searching... `["+event.getArgs()+"]`", 
                 m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), searchPrefix + event.getArgs(), new ResultHandler(m,event)));
     }
-    
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
     private class ResultHandler implements AudioLoadResultHandler 
     {
         private final Message m;
@@ -87,10 +92,10 @@ public class SearchCmd extends MusicCommand
         @Override
         public void trackLoaded(AudioTrack track)
         {
-            if(bot.getConfig().isTooLong(track))
+            if(botConfig.isTooLong(track))
             {
                 m.editMessage(FormatUtil.filter(event.getClient().getWarning()+" This track (**"+track.getInfo().title+"**) is longer than the allowed maximum: `"
-                        + TimeUtil.formatTime(track.getDuration())+"` > `"+bot.getConfig().getMaxTime()+"`")).queue();
+                        + TimeUtil.formatTime(track.getDuration())+"` > `"+botConfig.getMaxTime()+"`")).queue();
                 return;
             }
             AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
@@ -109,10 +114,10 @@ public class SearchCmd extends MusicCommand
                     .setSelection((msg,i) -> 
                     {
                         AudioTrack track = playlist.getTracks().get(i-1);
-                        if(bot.getConfig().isTooLong(track))
+                        if(botConfig.isTooLong(track))
                         {
                             event.replyWarning("This track (**"+track.getInfo().title+"**) is longer than the allowed maximum: `"
-                                    + TimeUtil.formatTime(track.getDuration())+"` > `"+bot.getConfig().getMaxTime()+"`");
+                                    + TimeUtil.formatTime(track.getDuration())+"` > `"+botConfig.getMaxTime()+"`");
                             return;
                         }
                         AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();

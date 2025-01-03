@@ -16,6 +16,7 @@
 package com.jagrosh.jmusicbot.audio;
 
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.BotConfig;
 import com.jagrosh.jmusicbot.entities.Pair;
 import com.jagrosh.jmusicbot.settings.Settings;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -39,16 +40,19 @@ public class NowplayingHandler
 {
     private final Bot bot;
     private final HashMap<Long,Pair<Long,Long>> lastNP; // guild -> channel,message
+
+    private BotConfig botConfig;
     
     public NowplayingHandler(Bot bot)
     {
         this.bot = bot;
         this.lastNP = new HashMap<>();
+        this.botConfig = BotConfig.getBotConfig();
     }
     
     public void init()
     {
-        if(!bot.getConfig().useNPImages())
+        if(!botConfig.useNPImages())
             bot.getThreadpool().scheduleWithFixedDelay(() -> updateAll(), 0, 5, TimeUnit.SECONDS);
     }
     
@@ -103,7 +107,7 @@ public class NowplayingHandler
     public void onTrackUpdate(AudioTrack track)
     {
         // update bot status if applicable
-        if(bot.getConfig().getSongInStatus())
+        if(botConfig.getSongInStatus())
         {
             if(track!=null && bot.getJDA().getGuilds().stream().filter(g -> g.getSelfMember().getVoiceState().inVoiceChannel()).count()<=1)
                 bot.getJDA().getPresence().setActivity(Activity.listening(track.getInfo().title));

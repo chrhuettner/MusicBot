@@ -30,12 +30,12 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
  */
 public class SetvcCmd extends AdminCommand 
 {
+    private static final String COMMAND_NAME = "setvc";
+
     public SetvcCmd(Bot bot)
     {
-        this.name = "setvc";
         this.help = "sets the voice channel for playing music";
         this.arguments = "<channel|NONE>";
-        this.aliases = bot.getConfig().getAliases(this.name);
     }
     
     @Override
@@ -65,5 +65,10 @@ public class SetvcCmd extends AdminCommand
                 event.reply(event.getClient().getSuccess()+" Music can now only be played in "+list.get(0).getAsMention());
             }
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

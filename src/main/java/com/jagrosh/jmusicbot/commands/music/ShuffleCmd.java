@@ -26,12 +26,12 @@ import com.jagrosh.jmusicbot.commands.MusicCommand;
  */
 public class ShuffleCmd extends MusicCommand 
 {
+    private static final String COMMAND_NAME = "shuffle";
+
     public ShuffleCmd(Bot bot)
     {
         super(bot);
-        this.name = "shuffle";
         this.help = "shuffles songs you have added";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.beListening = true;
         this.bePlaying = true;
     }
@@ -54,5 +54,9 @@ public class ShuffleCmd extends MusicCommand
                 break;
         }
     }
-    
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 }

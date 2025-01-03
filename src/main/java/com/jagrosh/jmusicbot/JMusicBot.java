@@ -51,6 +51,8 @@ public class JMusicBot
                                 Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_MANAGE, Permission.MESSAGE_EXT_EMOJI,
                                 Permission.VOICE_CONNECT, Permission.VOICE_SPEAK, Permission.NICKNAME_CHANGE};
     public final static GatewayIntent[] INTENTS = {GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS, GatewayIntent.GUILD_VOICE_STATES};
+
+    private static BotConfig config;
     
     /**
      * @param args the command line arguments
@@ -70,19 +72,19 @@ public class JMusicBot
 
     private static void startBot() {
         Prompt prompt = createPrompt();
-        BotConfig config = loadConfig(prompt);
-        if (config == null) return;
+        config = loadConfig(prompt);
+        if (loadConfig(prompt) == null) return;
 
-        setLogLevel(config);
+        setLogLevel();
 
         EventWaiter waiter = new EventWaiter();
         SettingsManager settings = new SettingsManager();
-        Bot bot = new Bot(waiter, config, settings);
-        CommandClient client = createCommandClient(config, settings, bot);
+        Bot bot = new Bot(waiter, settings);
+        CommandClient client = createCommandClient(settings, bot);
 
-        initializeGUI(bot, prompt, config);
+        initializeGUI(bot, prompt);
 
-        startJDA(bot, client, waiter, config, prompt);
+        startJDA(bot, client, waiter, prompt);
     }
 
     private static Prompt createPrompt() {
@@ -93,20 +95,20 @@ public class JMusicBot
         OtherUtil.checkVersion(prompt);
         OtherUtil.checkJavaVersion(prompt);
 
-        BotConfig config = new BotConfig(prompt);
-        config.load();
+        BotConfig config = BotConfig.createConfig(prompt);
+
         if (!config.isValid()) return null;
 
         LOG.info("Loaded config from " + config.getConfigLocation());
         return config;
     }
 
-    private static void setLogLevel(BotConfig config) {
+    private static void setLogLevel() {
         ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME))
                 .setLevel(Level.toLevel(config.getLogLevel(), Level.INFO));
     }
 
-    private static void initializeGUI(Bot bot, Prompt prompt, BotConfig config) {
+    private static void initializeGUI(Bot bot, Prompt prompt) {
         if (!prompt.isNoGUI()) {
             try {
                 GUI gui = new GUI(bot);
@@ -120,7 +122,7 @@ public class JMusicBot
         }
     }
 
-    private static void startJDA(Bot bot, CommandClient client, EventWaiter waiter, BotConfig config, Prompt prompt) {
+    private static void startJDA(Bot bot, CommandClient client, EventWaiter waiter, Prompt prompt) {
         try {
             JDA jda = JDABuilder.create(config.getToken(), Arrays.asList(INTENTS))
                     .enableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE)
@@ -172,9 +174,9 @@ public class JMusicBot
     }
 
 
-    private static CommandClient createCommandClient(BotConfig config, SettingsManager settings, Bot bot) {
+    private static CommandClient createCommandClient(SettingsManager settings, Bot bot) {
         AboutCommand aboutCommand = createAboutCommand();
-        CommandClientBuilder cb = setupCommandClient(config, settings, bot, aboutCommand);
+        CommandClientBuilder cb = setupCommandClient(settings, bot, aboutCommand);
         return cb.build();
     }
 
@@ -188,7 +190,7 @@ public class JMusicBot
         return aboutCommand;
     }
 
-    private static CommandClientBuilder setupCommandClient(BotConfig config, SettingsManager settings, Bot bot, AboutCommand aboutCommand) {
+    private static CommandClientBuilder setupCommandClient(SettingsManager settings, Bot bot, AboutCommand aboutCommand) {
         CommandClientBuilder cb = new CommandClientBuilder()
                 .setPrefix(config.getPrefix())
                 .setAlternativePrefix(config.getAltPrefix())
@@ -197,7 +199,7 @@ public class JMusicBot
                 .setHelpWord(config.getHelp())
                 .setLinkedCacheSize(200)
                 .setGuildSettingsManager(settings)
-                .addCommands(aboutCommand, new PingCommand(), new SettingsCmd(bot),
+                .addCommands(aboutCommand, new PingCommand(), new SettingsCmd(),
                         new LyricsCmd(bot), new NowplayingCmd(bot), new PlayCmd(bot), new PlaylistsCmd(bot), new QueueCmd(bot), new RemoveCmd(bot),
                         new SearchCmd(bot), new SCSearchCmd(bot), new SeekCmd(bot), new ShuffleCmd(bot), new SkipCmd(bot),
                         new ForceRemoveCmd(bot), new ForceskipCmd(bot), new MoveTrackCmd(bot), new PauseCmd(bot),

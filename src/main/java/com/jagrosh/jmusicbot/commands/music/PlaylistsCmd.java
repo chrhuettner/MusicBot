@@ -26,14 +26,13 @@ import com.jagrosh.jmusicbot.commands.MusicCommand;
  */
 public class PlaylistsCmd extends MusicCommand 
 {
+    private static final String COMMAND_NAME = "playlists";
+
     public PlaylistsCmd(Bot bot)
     {
         super(bot);
-        this.name = "playlists";
         this.help = "shows the available playlists";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = true;
-        this.beListening = false;
         this.beListening = false;
     }
     
@@ -59,5 +58,10 @@ public class PlaylistsCmd extends MusicCommand
             builder.append("\nType `").append(event.getClient().getTextualPrefix()).append("play playlist <name>` to play a playlist");
             event.reply(builder.toString());
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

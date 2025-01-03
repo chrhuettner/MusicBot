@@ -26,12 +26,12 @@ import net.dv8tion.jda.api.OnlineStatus;
  */
 public class SetstatusCmd extends OwnerCommand
 {
+    private static final String COMMAND_NAME = "setstatus";
+
     public SetstatusCmd(Bot bot)
     {
-        this.name = "setstatus";
         this.help = "sets the status the bot displays";
         this.arguments = "<status>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = false;
     }
     
@@ -52,5 +52,10 @@ public class SetstatusCmd extends OwnerCommand
         } catch(Exception e) {
             event.reply(event.getClient().getError()+" The status could not be set!");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

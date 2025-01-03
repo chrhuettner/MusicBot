@@ -47,15 +47,15 @@ public class PlayCmd extends MusicCommand
     private final static String CANCEL = "\uD83D\uDEAB"; // 🚫
     
     private final String loadingEmoji;
-    
+
+    private static final String COMMAND_NAME = "play";
+
     public PlayCmd(Bot bot)
     {
         super(bot);
-        this.loadingEmoji = bot.getConfig().getLoading();
-        this.name = "play";
+        this.loadingEmoji = botConfig.getLoading();
         this.arguments = "<title|URL|subcommand>";
         this.help = "plays the provided song";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.beListening = true;
         this.bePlaying = false;
         this.children = new Command[]{new PlaylistCmd(bot)};
@@ -91,7 +91,12 @@ public class PlayCmd extends MusicCommand
                 : event.getArgs().isEmpty() ? event.getMessage().getAttachments().get(0).getUrl() : event.getArgs();
         event.reply(loadingEmoji+" Loading... `["+args+"]`", m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), args, new ResultHandler(m,event,false)));
     }
-    
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
     private class ResultHandler implements AudioLoadResultHandler
     {
         private final Message m;
@@ -107,10 +112,10 @@ public class PlayCmd extends MusicCommand
         
         private void loadSingle(AudioTrack track, AudioPlaylist playlist)
         {
-            if(bot.getConfig().isTooLong(track))
+            if(botConfig.isTooLong(track))
             {
                 m.editMessage(FormatUtil.filter(event.getClient().getWarning()+" This track (**"+track.getInfo().title+"**) is longer than the allowed maximum: `"
-                        + TimeUtil.formatTime(track.getDuration())+"` > `"+ TimeUtil.formatTime(bot.getConfig().getMaxSeconds()*1000)+"`")).queue();
+                        + TimeUtil.formatTime(track.getDuration())+"` > `"+ TimeUtil.formatTime(botConfig.getMaxSeconds()*1000)+"`")).queue();
                 return;
             }
             AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
@@ -143,7 +148,7 @@ public class PlayCmd extends MusicCommand
         {
             int[] count = {0};
             playlist.getTracks().stream().forEach((track) -> {
-                if(!bot.getConfig().isTooLong(track) && !track.equals(exclude))
+                if(!botConfig.isTooLong(track) && !track.equals(exclude))
                 {
                     AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
                     handler.addTrack(new QueuedTrack(track, RequestMetadata.fromResultHandler(track, event)));
@@ -183,7 +188,7 @@ public class PlayCmd extends MusicCommand
                 else if(count==0)
                 {
                     m.editMessage(FormatUtil.filter(event.getClient().getWarning()+" All entries in this playlist "+(playlist.getName()==null ? "" : "(**"+playlist.getName()
-                            +"**) ")+"were longer than the allowed maximum (`"+bot.getConfig().getMaxTime()+"`)")).queue();
+                            +"**) ")+"were longer than the allowed maximum (`"+botConfig.getMaxTime()+"`)")).queue();
                 }
                 else
                 {
@@ -191,7 +196,7 @@ public class PlayCmd extends MusicCommand
                             +(playlist.getName()==null?"a playlist":"playlist **"+playlist.getName()+"**")+" with `"
                             + playlist.getTracks().size()+"` entries; added to the queue!"
                             + (count<playlist.getTracks().size() ? "\n"+event.getClient().getWarning()+" Tracks longer than the allowed maximum (`"
-                            + bot.getConfig().getMaxTime()+"`) have been omitted." : ""))).queue();
+                            + botConfig.getMaxTime()+"`) have been omitted." : ""))).queue();
                 }
             }
         }
@@ -217,10 +222,11 @@ public class PlayCmd extends MusicCommand
     
     public class PlaylistCmd extends MusicCommand
     {
+        private static final String COMMAND_NAME = "playlist";
+
         public PlaylistCmd(Bot bot)
         {
             super(bot);
-            this.name = "playlist";
             this.aliases = new String[]{"pl"};
             this.arguments = "<name>";
             this.help = "plays the provided playlist";
@@ -258,6 +264,11 @@ public class PlayCmd extends MusicCommand
                     m.editMessage(FormatUtil.filter(str)).queue();
                 });
             });
+        }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
         }
     }
 }

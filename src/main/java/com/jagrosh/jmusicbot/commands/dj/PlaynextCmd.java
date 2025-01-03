@@ -36,15 +36,15 @@ import net.dv8tion.jda.api.entities.Message;
 public class PlaynextCmd extends DJCommand
 {
     private final String loadingEmoji;
-    
+
+    private static final String COMMAND_NAME = "playnext";
+
     public PlaynextCmd(Bot bot)
     {
         super(bot);
-        this.loadingEmoji = bot.getConfig().getLoading();
-        this.name = "playnext";
+        this.loadingEmoji = botConfig.getLoading();
         this.arguments = "<title|URL>";
         this.help = "plays a single song next";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.beListening = true;
         this.bePlaying = false;
     }
@@ -62,7 +62,12 @@ public class PlaynextCmd extends DJCommand
                 : event.getArgs().isEmpty() ? event.getMessage().getAttachments().get(0).getUrl() : event.getArgs();
         event.reply(loadingEmoji+" Loading... `["+args+"]`", m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), args, new ResultHandler(m,event,false)));
     }
-    
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
     private class ResultHandler implements AudioLoadResultHandler
     {
         private final Message m;
@@ -78,10 +83,10 @@ public class PlaynextCmd extends DJCommand
         
         private void loadSingle(AudioTrack track)
         {
-            if(bot.getConfig().isTooLong(track))
+            if(botConfig.isTooLong(track))
             {
                 m.editMessage(FormatUtil.filter(event.getClient().getWarning()+" This track (**"+track.getInfo().title+"**) is longer than the allowed maximum: `"
-                        + TimeUtil.formatTime(track.getDuration())+"` > `"+ TimeUtil.formatTime(bot.getConfig().getMaxSeconds()*1000)+"`")).queue();
+                        + TimeUtil.formatTime(track.getDuration())+"` > `"+ TimeUtil.formatTime(botConfig.getMaxSeconds()*1000)+"`")).queue();
                 return;
             }
             AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();

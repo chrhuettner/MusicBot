@@ -28,12 +28,12 @@ import com.jagrosh.jmusicbot.utils.FormatUtil;
  */
 public class ForceskipCmd extends DJCommand 
 {
+    private static final String COMMAND_NAME = "forceskip";
+
     public ForceskipCmd(Bot bot)
     {
         super(bot);
-        this.name = "forceskip";
         this.help = "skips the current song";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.bePlaying = true;
     }
 
@@ -45,5 +45,10 @@ public class ForceskipCmd extends DJCommand
         event.reply(event.getClient().getSuccess()+" Skipped **"+handler.getPlayer().getPlayingTrack().getInfo().title
                 +"** "+(rm.getOwner() == 0L ? "(autoplay)" : "(requested by **" + FormatUtil.formatUsername(rm.user) + "**)"));
         handler.getPlayer().stopTrack();
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

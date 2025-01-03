@@ -30,12 +30,12 @@ import net.dv8tion.jda.api.entities.Role;
  */
 public class SetdjCmd extends AdminCommand
 {
+    private static final String COMMAND_NAME = "setdj";
+
     public SetdjCmd(Bot bot)
     {
-        this.name = "setdj";
         this.help = "sets the DJ role for certain music commands";
         this.arguments = "<rolename|NONE>";
-        this.aliases = bot.getConfig().getAliases(this.name);
     }
     
     @Override
@@ -66,5 +66,9 @@ public class SetdjCmd extends AdminCommand
             }
         }
     }
-    
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 }

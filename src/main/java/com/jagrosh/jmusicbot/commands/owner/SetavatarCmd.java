@@ -29,12 +29,12 @@ import net.dv8tion.jda.api.entities.Icon;
  */
 public class SetavatarCmd extends OwnerCommand 
 {
+    private static final String COMMAND_NAME = "setavatar";
+
     public SetavatarCmd(Bot bot)
     {
-        this.name = "setavatar";
         this.help = "sets the avatar of the bot";
         this.arguments = "<url>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = false;
     }
     
@@ -64,5 +64,10 @@ public class SetavatarCmd extends OwnerCommand
                 event.reply(event.getClient().getError()+" Could not load from provided URL.");
             }
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

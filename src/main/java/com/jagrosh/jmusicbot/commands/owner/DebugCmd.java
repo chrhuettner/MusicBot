@@ -18,6 +18,7 @@ package com.jagrosh.jmusicbot.commands.owner;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.BotConfig;
 import com.jagrosh.jmusicbot.commands.OwnerCommand;
 import com.jagrosh.jmusicbot.utils.OtherUtil;
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
@@ -35,14 +36,17 @@ public class DebugCmd extends OwnerCommand
         "java.runtime.name", "java.runtime.version", "java.specification.version",  "os.arch", "os.name"};
     
     private final Bot bot;
-    
+
+    private static final String COMMAND_NAME = "debug";
+
+    private BotConfig botConfig;
+
     public DebugCmd(Bot bot)
     {
         this.bot = bot;
-        this.name = "debug";
         this.help = "shows debug info";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = false;
+        this.botConfig = BotConfig.getBotConfig();
     }
 
     @Override
@@ -54,15 +58,15 @@ public class DebugCmd extends OwnerCommand
             sb.append("\n  ").append(key).append(" = ").append(System.getProperty(key));
         sb.append("\n\nJMusicBot Information:")
                 .append("\n  Version = ").append(OtherUtil.getCurrentVersion())
-                .append("\n  Owner = ").append(bot.getConfig().getOwnerId())
-                .append("\n  Prefix = ").append(bot.getConfig().getPrefix())
-                .append("\n  AltPrefix = ").append(bot.getConfig().getAltPrefix())
-                .append("\n  MaxSeconds = ").append(bot.getConfig().getMaxSeconds())
-                .append("\n  NPImages = ").append(bot.getConfig().useNPImages())
-                .append("\n  SongInStatus = ").append(bot.getConfig().getSongInStatus())
-                .append("\n  StayInChannel = ").append(bot.getConfig().getStay())
-                .append("\n  UseEval = ").append(bot.getConfig().useEval())
-                .append("\n  UpdateAlerts = ").append(bot.getConfig().useUpdateAlerts());
+                .append("\n  Owner = ").append(botConfig.getOwnerId())
+                .append("\n  Prefix = ").append(botConfig.getPrefix())
+                .append("\n  AltPrefix = ").append(botConfig.getAltPrefix())
+                .append("\n  MaxSeconds = ").append(botConfig.getMaxSeconds())
+                .append("\n  NPImages = ").append(botConfig.useNPImages())
+                .append("\n  SongInStatus = ").append(botConfig.getSongInStatus())
+                .append("\n  StayInChannel = ").append(botConfig.getStay())
+                .append("\n  UseEval = ").append(botConfig.useEval())
+                .append("\n  UpdateAlerts = ").append(botConfig.useUpdateAlerts());
         sb.append("\n\nDependency Information:")
                 .append("\n  JDA Version = ").append(JDAInfo.VERSION)
                 .append("\n  JDA-Utilities Version = ").append(JDAUtilitiesInfo.VERSION)
@@ -83,5 +87,10 @@ public class DebugCmd extends OwnerCommand
             event.getChannel().sendFile(sb.toString().getBytes(), "debug_information.txt").queue();
         else
             event.reply("Debug Information: " + sb.toString());
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

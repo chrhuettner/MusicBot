@@ -28,13 +28,12 @@ import com.jagrosh.jmusicbot.settings.Settings;
  */
 public class QueueTypeCmd extends AdminCommand
 {
+    private static final String COMMAND_NAME = "queuetype";
+
     public QueueTypeCmd(Bot bot)
     {
-        super();
-        this.name = "queuetype";
         this.help = "changes the queue type";
         this.arguments = "[" + String.join("|", QueueType.getNames()) + "]";
-        this.aliases = bot.getConfig().getAliases(this.name);
     }
 
     @Override
@@ -71,5 +70,10 @@ public class QueueTypeCmd extends AdminCommand
         }
 
         event.reply(value.getEmoji() + " Queue type was set to `" + value.getUserFriendlyName() + "`.");
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

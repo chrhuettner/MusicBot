@@ -18,6 +18,7 @@ package com.jagrosh.jmusicbot.commands.general;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.commands.AliasCommand;
 import com.jagrosh.jmusicbot.settings.QueueType;
 import com.jagrosh.jmusicbot.settings.RepeatMode;
 import com.jagrosh.jmusicbot.settings.Settings;
@@ -32,15 +33,15 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
  *
  * @author John Grosh <john.a.grosh@gmail.com>
  */
-public class SettingsCmd extends Command 
+public class SettingsCmd extends AliasCommand
 {
     private final static String EMOJI = "\uD83C\uDFA7"; // 🎧
-    
-    public SettingsCmd(Bot bot)
+
+    private static final String COMMAND_NAME = "settings";
+
+    public SettingsCmd()
     {
-        this.name = "settings";
         this.help = "shows the bots settings";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = true;
     }
     
@@ -74,5 +75,9 @@ public class SettingsCmd extends Command
                         + " audio connections", null);
         event.getChannel().sendMessage(builder.setEmbeds(ebuilder.build()).build()).queue();
     }
-    
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 }

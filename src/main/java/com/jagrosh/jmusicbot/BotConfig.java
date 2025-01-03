@@ -51,25 +51,37 @@ public class BotConfig
     private Config aliases, transforms;
 
     private boolean valid = false;
+
+    private static BotConfig botConfig;
     
-    public BotConfig(Prompt prompt)
+    private BotConfig(Prompt prompt)
     {
         this.prompt = prompt;
     }
 
-    public void load() {
-        valid = false;
-        path = getConfigPath();
-        Config config = loadConfig();
-        if (config == null) return;
+    public static BotConfig getBotConfig(){
+        if(botConfig == null){
+            throw new RuntimeException("Bot config was not initialized at startup!");
+        }
 
-        setConfigValues(config);
-        boolean write = validateBotToken();
-        write |= validateBotOwner();
+        return botConfig;
+    }
+    public static BotConfig createConfig(Prompt prompt) {
+        botConfig = new BotConfig(prompt);
+        botConfig.valid = false;
+        botConfig.path = getConfigPath();
+        Config config = botConfig.loadConfig();
+        if (config == null) return botConfig;
 
-        if (write) writeToFile();
+        botConfig.setConfigValues(config);
+        boolean write = botConfig.validateBotToken();
+        write |= botConfig.validateBotOwner();
 
-        valid = true;
+        if (write) botConfig.writeToFile();
+
+        botConfig.valid = true;
+
+        return botConfig;
     }
 
     private Config loadConfig() {

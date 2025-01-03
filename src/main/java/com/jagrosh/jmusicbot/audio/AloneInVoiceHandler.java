@@ -16,6 +16,7 @@
 package com.jagrosh.jmusicbot.audio;
 
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.BotConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
@@ -36,14 +37,17 @@ public class AloneInVoiceHandler
     private final HashMap<Long, Instant> aloneSince = new HashMap<>();
     private long aloneTimeUntilStop = 0;
 
+    private BotConfig botConfig;
+
     public AloneInVoiceHandler(Bot bot)
     {
         this.bot = bot;
+        this.botConfig = BotConfig.getBotConfig();
     }
     
     public void init()
     {
-        aloneTimeUntilStop = bot.getConfig().getAloneTimeUntilStop();
+        aloneTimeUntilStop = botConfig.getAloneTimeUntilStop();
         if(aloneTimeUntilStop > 0)
             bot.getThreadpool().scheduleWithFixedDelay(() -> check(), 0, 5, TimeUnit.SECONDS);
     }

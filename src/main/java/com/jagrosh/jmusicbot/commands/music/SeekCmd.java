@@ -33,14 +33,14 @@ import org.slf4j.LoggerFactory;
 public class SeekCmd extends MusicCommand
 {
     private final static Logger LOG = LoggerFactory.getLogger("Seeking");
-    
+
+    private static final String COMMAND_NAME = "seek";
+
     public SeekCmd(Bot bot)
     {
         super(bot);
-        this.name = "seek";
         this.help = "seeks the current song";
         this.arguments = "[+ | -] <HH:MM:SS | MM:SS | SS>|<0h0m0s | 0m0s | 0s>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.beListening = true;
         this.bePlaying = true;
     }
@@ -104,4 +104,8 @@ public class SeekCmd extends MusicCommand
         }
     }
 
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 }

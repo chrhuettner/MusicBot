@@ -27,13 +27,13 @@ import com.jagrosh.jmusicbot.settings.Settings;
  */
 public class RepeatCmd extends DJCommand
 {
+    private static final String COMMAND_NAME = "repeat";
+
     public RepeatCmd(Bot bot)
     {
         super(bot);
-        this.name = "repeat";
         this.help = "re-adds music to the queue when finished";
         this.arguments = "[off|all|single]";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = true;
     }
     
@@ -74,4 +74,9 @@ public class RepeatCmd extends DJCommand
 
     @Override
     public void doCommand(CommandEvent event) { /* Intentionally Empty */ }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 }

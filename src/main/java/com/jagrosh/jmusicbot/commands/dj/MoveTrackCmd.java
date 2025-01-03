@@ -13,14 +13,13 @@ import com.jagrosh.jmusicbot.queue.AbstractQueue;
  */
 public class MoveTrackCmd extends DJCommand
 {
+    private static final String COMMAND_NAME = "movetrack";
 
     public MoveTrackCmd(Bot bot)
     {
         super(bot);
-        this.name = "movetrack";
         this.help = "move a track in the current queue to a different position";
         this.arguments = "<from> <to>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.bePlaying = true;
     }
 
@@ -81,5 +80,10 @@ public class MoveTrackCmd extends DJCommand
     private static boolean isUnavailablePosition(AbstractQueue<QueuedTrack> queue, int position)
     {
         return (position < 1 || position > queue.size());
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

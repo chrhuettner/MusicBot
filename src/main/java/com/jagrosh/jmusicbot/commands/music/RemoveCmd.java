@@ -30,13 +30,13 @@ import net.dv8tion.jda.api.entities.User;
  */
 public class RemoveCmd extends MusicCommand 
 {
+    private static final String COMMAND_NAME = "remove";
+
     public RemoveCmd(Bot bot)
     {
         super(bot);
-        this.name = "remove";
         this.help = "removes a song from the queue";
         this.arguments = "<position|ALL>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.beListening = true;
         this.bePlaying = true;
     }
@@ -112,5 +112,10 @@ public class RemoveCmd extends MusicCommand
         }
         event.replySuccess("Removed **" + qt.getTrack().getInfo().title + "** from the queue (requested by " +
                 (u == null ? "someone" : "**" + u.getName() + "**") + ")");
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

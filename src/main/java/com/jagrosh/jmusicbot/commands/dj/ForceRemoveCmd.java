@@ -35,13 +35,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class ForceRemoveCmd extends DJCommand
 {
+    private static final String COMMAND_NAME = "forceremove";
+
     public ForceRemoveCmd(Bot bot)
     {
         super(bot);
-        this.name = "forceremove";
         this.help = "removes all entries by a user from the queue";
         this.arguments = "<user>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.beListening = false;
         this.bePlaying = true;
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
@@ -116,5 +116,10 @@ public class ForceRemoveCmd extends DJCommand
         {
             event.replySuccess("Successfully removed `"+count+"` entries from "+FormatUtil.formatUsername(target)+".");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

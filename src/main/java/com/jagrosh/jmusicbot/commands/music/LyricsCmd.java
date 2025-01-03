@@ -30,14 +30,14 @@ import net.dv8tion.jda.api.Permission;
 public class LyricsCmd extends MusicCommand
 {
     private final LyricsClient client = new LyricsClient();
-    
+
+    private static final String COMMAND_NAME = "lyrics";
+
     public LyricsCmd(Bot bot)
     {
         super(bot);
-        this.name = "lyrics";
         this.arguments = "[song name]";
         this.help = "shows the lyrics of a song";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
@@ -96,5 +96,10 @@ public class LyricsCmd extends MusicCommand
             else
                 event.reply(eb.setDescription(lyrics.getContent()).build());
         });
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

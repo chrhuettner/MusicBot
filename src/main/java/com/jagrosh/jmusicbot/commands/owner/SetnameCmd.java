@@ -26,12 +26,12 @@ import net.dv8tion.jda.api.exceptions.RateLimitedException;
  */
 public class SetnameCmd extends OwnerCommand
 {
+    private static final String COMMAND_NAME = "setname";
+
     public SetnameCmd(Bot bot)
     {
-        this.name = "setname";
         this.help = "sets the name of the bot";
         this.arguments = "<name>";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = false;
     }
     
@@ -52,5 +52,10 @@ public class SetnameCmd extends OwnerCommand
         {
             event.reply(event.getClient().getError()+" That name is not valid!");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

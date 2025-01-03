@@ -30,14 +30,15 @@ import com.jagrosh.jmusicbot.playlist.PlaylistLoader.Playlist;
 public class PlaylistCmd extends OwnerCommand 
 {
     private final Bot bot;
+
+    private static final String COMMAND_NAME = "playlist";
+
     public PlaylistCmd(Bot bot)
     {
         this.bot = bot;
         this.guildOnly = false;
-        this.name = "playlist";
         this.arguments = "<append|delete|make|setdefault>";
         this.help = "playlist management";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.children = new OwnerCommand[]{
             new ListCmd(),
             new AppendlistCmd(),
@@ -56,12 +57,18 @@ public class PlaylistCmd extends OwnerCommand
                     .append(" ").append(cmd.getArguments()==null ? "" : cmd.getArguments()).append("` - ").append(cmd.getHelp());
         event.reply(builder.toString());
     }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
     
     public class MakelistCmd extends OwnerCommand 
     {
+        private static final String COMMAND_NAME = "make";
+
         public MakelistCmd()
         {
-            this.name = "make";
             this.aliases = new String[]{"create"};
             this.help = "makes a new playlist";
             this.arguments = "<name>";
@@ -92,13 +99,19 @@ public class PlaylistCmd extends OwnerCommand
             else
                 event.reply(event.getClient().getError()+" Playlist `"+pname+"` already exists!");
         }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
+        }
     }
     
     public class DeletelistCmd extends OwnerCommand 
     {
+        private static final String COMMAND_NAME = "delete";
+
         public DeletelistCmd()
         {
-            this.name = "delete";
             this.aliases = new String[]{"remove"};
             this.help = "deletes an existing playlist";
             this.arguments = "<name>";
@@ -124,13 +137,19 @@ public class PlaylistCmd extends OwnerCommand
                 }
             }
         }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
+        }
     }
     
     public class AppendlistCmd extends OwnerCommand 
     {
+        private static final String COMMAND_NAME = "append";
+
         public AppendlistCmd()
         {
-            this.name = "append";
             this.aliases = new String[]{"add"};
             this.help = "appends songs to an existing playlist";
             this.arguments = "<name> <URL> | <URL> | ...";
@@ -173,25 +192,37 @@ public class PlaylistCmd extends OwnerCommand
                 }
             }
         }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
+        }
     }
     
     public class DefaultlistCmd extends AutoplaylistCmd 
     {
+        private static final String COMMAND_NAME = "setdefault";
+
         public DefaultlistCmd(Bot bot)
         {
             super(bot);
-            this.name = "setdefault";
             this.aliases = new String[]{"default"};
             this.arguments = "<playlistname|NONE>";
             this.guildOnly = true;
+        }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
         }
     }
     
     public class ListCmd extends OwnerCommand 
     {
+        private static final String COMMAND_NAME = "all";
+
         public ListCmd()
         {
-            this.name = "all";
             this.aliases = new String[]{"available","list"};
             this.help = "lists all available playlists";
             this.guildOnly = true;
@@ -218,6 +249,11 @@ public class PlaylistCmd extends OwnerCommand
                 list.forEach(str -> builder.append("`").append(str).append("` "));
                 event.reply(builder.toString());
             }
+        }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
         }
     }
 }

@@ -26,12 +26,12 @@ import com.jagrosh.jmusicbot.settings.Settings;
  */
 public class PrefixCmd extends AdminCommand
 {
+    private static final String COMMAND_NAME = "prefix";
+
     public PrefixCmd(Bot bot)
     {
-        this.name = "prefix";
         this.help = "sets a server-specific prefix";
         this.arguments = "<prefix|NONE>";
-        this.aliases = bot.getConfig().getAliases(this.name);
     }
     
     @Override
@@ -54,5 +54,10 @@ public class PrefixCmd extends AdminCommand
             s.setPrefix(event.getArgs());
             event.replySuccess("Custom prefix set to `" + event.getArgs() + "` on *" + event.getGuild().getName() + "*");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

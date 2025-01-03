@@ -26,12 +26,12 @@ import com.jagrosh.jmusicbot.commands.DJCommand;
  */
 public class PauseCmd extends DJCommand 
 {
+    private static final String COMMAND_NAME = "pause";
+
     public PauseCmd(Bot bot)
     {
         super(bot);
-        this.name = "pause";
         this.help = "pauses the current song";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.bePlaying = true;
     }
 
@@ -46,5 +46,10 @@ public class PauseCmd extends DJCommand
         }
         handler.getPlayer().setPaused(true);
         event.replySuccess("Paused **"+handler.getPlayer().getPlayingTrack().getInfo().title+"**. Type `"+event.getClient().getPrefix()+"play` to unpause!");
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

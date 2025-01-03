@@ -40,14 +40,14 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 public class QueueCmd extends MusicCommand 
 {
     private final Paginator.Builder builder;
-    
+
+    private static final String COMMAND_NAME = "queue";
+
     public QueueCmd(Bot bot)
     {
         super(bot);
-        this.name = "queue";
         this.help = "shows the current queue";
         this.arguments = "[pagenum]";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.bePlaying = true;
         this.botPermissions = new Permission[]{Permission.MESSAGE_ADD_REACTION,Permission.MESSAGE_EMBED_LINKS};
         builder = new Paginator.Builder()
@@ -128,5 +128,10 @@ public class QueueCmd extends MusicCommand
                 .append(" entries | `").append(TimeUtil.formatTime(total)).append("` ")
                 .append("| ").append(queueType.getEmoji()).append(" `").append(queueType.getUserFriendlyName()).append('`')
                 .append(repeatmode.getEmoji() != null ? " | "+repeatmode.getEmoji() : "").toString());
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

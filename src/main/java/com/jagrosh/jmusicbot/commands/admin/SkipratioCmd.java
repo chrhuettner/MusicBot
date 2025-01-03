@@ -26,12 +26,12 @@ import com.jagrosh.jmusicbot.settings.Settings;
  */
 public class SkipratioCmd extends AdminCommand
 {
+    private static final String COMMAND_NAME = "setskip";
+
     public SkipratioCmd(Bot bot)
     {
-        this.name = "setskip";
         this.help = "sets a server-specific skip percentage";
         this.arguments = "<0 - 100>";
-        this.aliases = bot.getConfig().getAliases(this.name);
     }
     
     @Override
@@ -53,5 +53,10 @@ public class SkipratioCmd extends AdminCommand
         {
             event.replyError("Please include an integer between 0 and 100 (default is 55). This number is the percentage of listening users that must vote to skip a song.");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

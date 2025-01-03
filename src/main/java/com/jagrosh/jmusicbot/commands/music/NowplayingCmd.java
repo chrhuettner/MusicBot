@@ -28,12 +28,12 @@ import net.dv8tion.jda.api.entities.Message;
  */
 public class NowplayingCmd extends MusicCommand 
 {
+    private static final String COMMAND_NAME = "nowplaying";
+
     public NowplayingCmd(Bot bot)
     {
         super(bot);
-        this.name = "nowplaying";
         this.help = "shows the song that is currently playing";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
@@ -51,5 +51,10 @@ public class NowplayingCmd extends MusicCommand
         {
             event.reply(m, msg -> bot.getNowplayingHandler().setLastNPMessage(msg));
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

@@ -28,12 +28,12 @@ import com.jagrosh.jmusicbot.utils.FormatUtil;
  */
 public class SkipCmd extends MusicCommand 
 {
+    private static final String COMMAND_NAME = "skip";
+
     public SkipCmd(Bot bot)
     {
         super(bot);
-        this.name = "skip";
         this.help = "votes to skip the current song";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.beListening = true;
         this.bePlaying = true;
     }
@@ -45,7 +45,7 @@ public class SkipCmd extends MusicCommand
         RequestMetadata rm = handler.getRequestMetadata();
         double skipRatio = bot.getSettingsManager().getSettings(event.getGuild()).getSkipRatio();
         if(skipRatio == -1) {
-          skipRatio = bot.getConfig().getSkipRatio();
+          skipRatio = botConfig.getSkipRatio();
         }
         if(event.getAuthor().getIdLong() == rm.getOwner() || skipRatio == 0)
         {
@@ -76,6 +76,11 @@ public class SkipCmd extends MusicCommand
             }
             event.reply(msg);
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
     
 }

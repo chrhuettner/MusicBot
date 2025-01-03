@@ -26,12 +26,12 @@ import net.dv8tion.jda.api.entities.Activity;
  */
 public class SetgameCmd extends OwnerCommand
 {
+    private static final String COMMAND_NAME = "setgame";
+
     public SetgameCmd(Bot bot)
     {
-        this.name = "setgame";
         this.help = "sets the game the bot is playing";
         this.arguments = "[action] [game]";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.guildOnly = false;
         this.children = new OwnerCommand[]{
             new SetlistenCmd(),
@@ -55,12 +55,18 @@ public class SetgameCmd extends OwnerCommand
             event.reply(event.getClient().getError()+" The game could not be set!");
         }
     }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
     
     private class SetstreamCmd extends OwnerCommand
     {
+        private static final String COMMAND_NAME = "stream";
+
         private SetstreamCmd()
         {
-            this.name = "stream";
             this.aliases = new String[]{"twitch","streaming"};
             this.help = "sets the game the bot is playing to a stream";
             this.arguments = "<username> <game>";
@@ -87,13 +93,19 @@ public class SetgameCmd extends OwnerCommand
                 event.reply(event.getClient().getError()+" The game could not be set!");
             }
         }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
+        }
     }
     
     private class SetlistenCmd extends OwnerCommand
     {
+        private static final String COMMAND_NAME = "listen";
+
         private SetlistenCmd()
         {
-            this.name = "listen";
             this.aliases = new String[]{"listening"};
             this.help = "sets the game the bot is listening to";
             this.arguments = "<title>";
@@ -117,13 +129,19 @@ public class SetgameCmd extends OwnerCommand
                 event.reply(event.getClient().getError()+" The game could not be set!");
             }
         }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
+        }
     }
     
     private class SetwatchCmd extends OwnerCommand
     {
+        private static final String COMMAND_NAME = "watch";
+
         private SetwatchCmd()
         {
-            this.name = "watch";
             this.aliases = new String[]{"watching"};
             this.help = "sets the game the bot is watching";
             this.arguments = "<title>";
@@ -146,6 +164,11 @@ public class SetgameCmd extends OwnerCommand
             } catch(Exception e) {
                 event.reply(event.getClient().getError()+" The game could not be set!");
             }
+        }
+
+        @Override
+        public String getCommandName() {
+            return COMMAND_NAME;
         }
     }
 }

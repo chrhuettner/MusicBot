@@ -26,12 +26,12 @@ import com.jagrosh.jmusicbot.commands.DJCommand;
  */
 public class StopCmd extends DJCommand 
 {
+    private static final String COMMAND_NAME = "stop";
+
     public StopCmd(Bot bot)
     {
         super(bot);
-        this.name = "stop";
         this.help = "stops the current song and clears the queue";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.bePlaying = false;
     }
 
@@ -42,5 +42,10 @@ public class StopCmd extends DJCommand
         handler.stopAndClear();
         event.getGuild().getAudioManager().closeAudioConnection();
         event.reply(event.getClient().getSuccess()+" The player has stopped and the queue has been cleared.");
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

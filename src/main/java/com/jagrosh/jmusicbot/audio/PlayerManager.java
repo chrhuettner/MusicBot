@@ -17,6 +17,7 @@ package com.jagrosh.jmusicbot.audio;
 
 import com.dunctebot.sourcemanagers.DuncteBotSources;
 import com.jagrosh.jmusicbot.Bot;
+import com.jagrosh.jmusicbot.BotConfig;
 import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -39,18 +40,21 @@ import net.dv8tion.jda.api.entities.Guild;
 public class PlayerManager extends DefaultAudioPlayerManager
 {
     private final Bot bot;
+
+    private BotConfig botConfig;
     
     public PlayerManager(Bot bot)
     {
         this.bot = bot;
+        this.botConfig = BotConfig.getBotConfig();
     }
     
     public void init()
     {
-        TransformativeAudioSourceManager.createTransforms(bot.getConfig().getTransforms()).forEach(t -> registerSourceManager(t));
+        TransformativeAudioSourceManager.createTransforms(botConfig.getTransforms()).forEach(t -> registerSourceManager(t));
 
         YoutubeAudioSourceManager yt = new YoutubeAudioSourceManager(true);
-        yt.setPlaylistPageCount(bot.getConfig().getMaxYTPlaylistPages());
+        yt.setPlaylistPageCount(botConfig.getMaxYTPlaylistPages());
         registerSourceManager(yt);
 
         registerSourceManager(SoundCloudAudioSourceManager.createDefault());

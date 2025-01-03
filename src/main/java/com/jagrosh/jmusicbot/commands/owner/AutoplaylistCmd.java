@@ -27,15 +27,15 @@ import com.jagrosh.jmusicbot.settings.Settings;
 public class AutoplaylistCmd extends OwnerCommand
 {
     private final Bot bot;
-    
+
+    private static final String COMMAND_NAME = "autoplaylist";
+
     public AutoplaylistCmd(Bot bot)
     {
         this.bot = bot;
         this.guildOnly = true;
-        this.name = "autoplaylist";
         this.arguments = "<name|NONE>";
         this.help = "sets the default playlist for the server";
-        this.aliases = bot.getConfig().getAliases(this.name);
     }
 
     @Override
@@ -64,5 +64,10 @@ public class AutoplaylistCmd extends OwnerCommand
             settings.setDefaultPlaylist(pname);
             event.reply(event.getClient().getSuccess()+" The default playlist for **"+event.getGuild().getName()+"** is now `"+pname+"`");
         }
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 }

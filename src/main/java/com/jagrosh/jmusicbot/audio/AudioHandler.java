@@ -15,6 +15,7 @@
  */
 package com.jagrosh.jmusicbot.audio;
 
+import com.jagrosh.jmusicbot.BotConfig;
 import com.jagrosh.jmusicbot.playlist.PlaylistLoader.Playlist;
 import com.jagrosh.jmusicbot.queue.AbstractQueue;
 import com.jagrosh.jmusicbot.settings.QueueType;
@@ -64,11 +65,14 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
     private AudioFrame lastFrame;
     private AbstractQueue<QueuedTrack> queue;
 
+    private BotConfig botConfig;
+
     protected AudioHandler(PlayerManager manager, Guild guild, AudioPlayer player)
     {
         this.manager = manager;
         this.audioPlayer = player;
         this.guildId = guild.getIdLong();
+        this.botConfig = BotConfig.getBotConfig();
 
         this.setQueueType(manager.getBot().getSettingsManager().getSettings(guildId).getQueueType());
     }
@@ -161,7 +165,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
                 defaultQueue.add(at);
         }, () -> 
         {
-            if(pl.getTracks().isEmpty() && !manager.getBot().getConfig().getStay())
+            if(pl.getTracks().isEmpty() && !botConfig.getStay())
                 manager.getBot().closeAudioConnection(guildId);
         });
         return true;
@@ -187,7 +191,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
             if(!playFromDefault())
             {
                 manager.getBot().getNowplayingHandler().onTrackUpdate(null);
-                if(!manager.getBot().getConfig().getStay())
+                if(!botConfig.getStay())
                     manager.getBot().closeAudioConnection(guildId);
                 // unpause, in the case when the player was paused and the track has been skipped.
                 // this is to prevent the player being paused next time it's being used.
@@ -222,7 +226,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
             Guild guild = guild(jda);
             AudioTrack track = audioPlayer.getPlayingTrack();
             MessageBuilder mb = new MessageBuilder();
-            mb.append(FormatUtil.filter(manager.getBot().getConfig().getSuccess()+" **Now Playing in "+guild.getSelfMember().getVoiceState().getChannel().getAsMention()+"...**"));
+            mb.append(FormatUtil.filter(botConfig.getSuccess()+" **Now Playing in "+guild.getSelfMember().getVoiceState().getChannel().getAsMention()+"...**"));
             EmbedBuilder eb = new EmbedBuilder();
             eb.setColor(guild.getSelfMember().getColor());
             RequestMetadata rm = getRequestMetadata();
@@ -244,7 +248,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
                 eb.setTitle(track.getInfo().title);
             }
 
-            if(track instanceof YoutubeAudioTrack && manager.getBot().getConfig().useNPImages())
+            if(track instanceof YoutubeAudioTrack && botConfig.useNPImages())
             {
                 eb.setThumbnail("https://img.youtube.com/vi/"+track.getIdentifier()+"/mqdefault.jpg");
             }
@@ -267,7 +271,7 @@ public class AudioHandler extends AudioEventAdapter implements AudioSendHandler
     {
         Guild guild = guild(jda);
         return new MessageBuilder()
-                .setContent(FormatUtil.filter(manager.getBot().getConfig().getSuccess()+" **Now Playing...**"))
+                .setContent(FormatUtil.filter(botConfig.getSuccess()+" **Now Playing...**"))
                 .setEmbeds(new EmbedBuilder()
                 .setTitle("No music playing")
                 .setDescription(STOP_EMOJI+" "+FormatUtil.progressBar(-1)+" "+FormatUtil.volumeIcon(audioPlayer.getVolume()))

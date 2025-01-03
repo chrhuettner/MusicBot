@@ -28,11 +28,11 @@ import com.jagrosh.jmusicbot.utils.FormatUtil;
  */
 public class VolumeCmd extends DJCommand
 {
+    private static final String COMMAND_NAME = "volume";
+
     public VolumeCmd(Bot bot)
     {
         super(bot);
-        this.name = "volume";
-        this.aliases = bot.getConfig().getAliases(this.name);
         this.help = "sets or shows volume";
         this.arguments = "[0-150]";
     }
@@ -65,5 +65,9 @@ public class VolumeCmd extends DJCommand
             }
         }
     }
-    
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 }
