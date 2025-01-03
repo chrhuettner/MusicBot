@@ -42,59 +42,75 @@ public class RemoveCmd extends MusicCommand
     }
 
     @Override
-    public void doCommand(CommandEvent event) 
-    {
-        AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-        if(handler.getQueue().isEmpty())
-        {
+    public void doCommand(CommandEvent event) {
+        AudioHandler handler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
+        if (handler.getQueue().isEmpty()) {
             event.replyError("There is nothing in the queue!");
             return;
         }
-        if(event.getArgs().equalsIgnoreCase("all"))
-        {
-            int count = handler.getQueue().removeAll(event.getAuthor().getIdLong());
-            if(count==0)
-                event.replyWarning("You don't have any songs in the queue!");
-            else
-                event.replySuccess("Successfully removed your "+count+" entries.");
+
+        if (event.getArgs().equalsIgnoreCase("all")) {
+            removeAllUserEntries(event, handler);
             return;
         }
-        int pos;
+
+        int pos = parsePosition(event.getArgs(), handler.getQueue().size());
+        if (pos == -1) {
+            event.replyError("Position must be a valid integer between 1 and " + handler.getQueue().size() + "!");
+            return;
+        }
+
+        removeSpecificEntry(event, handler, pos);
+    }
+
+    private void removeAllUserEntries(CommandEvent event, AudioHandler handler) {
+        int count = handler.getQueue().removeAll(event.getAuthor().getIdLong());
+        if (count == 0) {
+            event.replyWarning("You don't have any songs in the queue!");
+        } else {
+            event.replySuccess("Successfully removed your " + count + " entries.");
+        }
+    }
+
+    private int parsePosition(String args, int maxSize) {
         try {
-            pos = Integer.parseInt(event.getArgs());
-        } catch(NumberFormatException e) {
-            pos = 0;
+            int pos = Integer.parseInt(args);
+            if (pos < 1 || pos > maxSize) return -1;
+            return pos;
+        } catch (NumberFormatException e) {
+            return -1;
         }
-        if(pos<1 || pos>handler.getQueue().size())
-        {
-            event.replyError("Position must be a valid integer between 1 and "+handler.getQueue().size()+"!");
-            return;
-        }
+    }
+
+    private void removeSpecificEntry(CommandEvent event, AudioHandler handler, int pos) {
         Settings settings = event.getClient().getSettingsFor(event.getGuild());
-        boolean isDJ = event.getMember().hasPermission(Permission.MANAGE_SERVER);
-        if(!isDJ)
-            isDJ = event.getMember().getRoles().contains(settings.getRole(event.getGuild()));
-        QueuedTrack qt = handler.getQueue().get(pos-1);
-        if(qt.getIdentifier()==event.getAuthor().getIdLong())
-        {
-            handler.getQueue().remove(pos-1);
-            event.replySuccess("Removed **"+qt.getTrack().getInfo().title+"** from the queue");
+        boolean isDJ = checkDJPermission(event, settings);
+
+        QueuedTrack qt = handler.getQueue().get(pos - 1);
+        if (qt.getIdentifier() == event.getAuthor().getIdLong()) {
+            handler.getQueue().remove(pos - 1);
+            event.replySuccess("Removed **" + qt.getTrack().getInfo().title + "** from the queue");
+        } else if (isDJ) {
+            handler.getQueue().remove(pos - 1);
+            notifyUserRemoval(event, qt);
+        } else {
+            event.replyError("You cannot remove **" + qt.getTrack().getInfo().title + "** because you didn't add it!");
         }
-        else if(isDJ)
-        {
-            handler.getQueue().remove(pos-1);
-            User u;
-            try {
-                u = event.getJDA().getUserById(qt.getIdentifier());
-            } catch(Exception e) {
-                u = null;
-            }
-            event.replySuccess("Removed **"+qt.getTrack().getInfo().title
-                    +"** from the queue (requested by "+(u==null ? "someone" : "**"+u.getName()+"**")+")");
+    }
+
+    private boolean checkDJPermission(CommandEvent event, Settings settings) {
+        return event.getMember().hasPermission(Permission.MANAGE_SERVER) ||
+                event.getMember().getRoles().contains(settings.getRole(event.getGuild()));
+    }
+
+    private void notifyUserRemoval(CommandEvent event, QueuedTrack qt) {
+        User u;
+        try {
+            u = event.getJDA().getUserById(qt.getIdentifier());
+        } catch (Exception e) {
+            u = null;
         }
-        else
-        {
-            event.replyError("You cannot remove **"+qt.getTrack().getInfo().title+"** because you didn't add it!");
-        }
+        event.replySuccess("Removed **" + qt.getTrack().getInfo().title + "** from the queue (requested by " +
+                (u == null ? "someone" : "**" + u.getName() + "**") + ")");
     }
 }
