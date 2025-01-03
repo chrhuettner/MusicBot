@@ -39,7 +39,7 @@ public class ForceRemoveCmd extends DJCommand
 
     public ForceRemoveCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "removes all entries by a user from the queue";
         this.arguments = "<user>";
         this.beListening = false;
@@ -118,8 +118,4 @@ public class ForceRemoveCmd extends DJCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

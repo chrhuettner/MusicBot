@@ -23,8 +23,9 @@ import net.dv8tion.jda.api.Permission;
  */
 public abstract class AdminCommand extends AliasCommand
 {
-    public AdminCommand()
+    public AdminCommand(String commandName)
     {
+        super(commandName);
         this.category = new Category("Admin", event ->
         {
             if(event.getAuthor().getId().equals(event.getClient().getOwnerId()))

@@ -30,7 +30,7 @@ public class PlaylistsCmd extends MusicCommand
 
     public PlaylistsCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "shows the available playlists";
         this.guildOnly = true;
         this.beListening = false;
@@ -60,8 +60,5 @@ public class PlaylistsCmd extends MusicCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
+
 }

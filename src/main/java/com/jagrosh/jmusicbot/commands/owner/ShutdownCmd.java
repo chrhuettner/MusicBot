@@ -30,6 +30,7 @@ public class ShutdownCmd extends OwnerCommand
 
     public ShutdownCmd(Bot bot)
     {
+        super(COMMAND_NAME);
         this.bot = bot;
         this.help = "safely shuts down";
         this.guildOnly = false;
@@ -42,8 +43,4 @@ public class ShutdownCmd extends OwnerCommand
         bot.shutdown();
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

@@ -47,7 +47,12 @@ public class SearchCmd extends MusicCommand
 
     public SearchCmd(Bot bot)
     {
-        super(bot);
+       this(COMMAND_NAME, bot);
+    }
+
+    public SearchCmd(String commandName, Bot bot)
+    {
+        super(commandName, bot);
         this.searchingEmoji = botConfig.getSearching();
         this.arguments = "<query>";
         this.help = "searches Youtube for a provided query";
@@ -73,10 +78,7 @@ public class SearchCmd extends MusicCommand
                 m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), searchPrefix + event.getArgs(), new ResultHandler(m,event)));
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
+
 
     private class ResultHandler implements AudioLoadResultHandler 
     {

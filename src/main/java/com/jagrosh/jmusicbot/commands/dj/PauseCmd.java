@@ -30,7 +30,7 @@ public class PauseCmd extends DJCommand
 
     public PauseCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "pauses the current song";
         this.bePlaying = true;
     }
@@ -48,8 +48,4 @@ public class PauseCmd extends DJCommand
         event.replySuccess("Paused **"+handler.getPlayer().getPlayingTrack().getInfo().title+"**. Type `"+event.getClient().getPrefix()+"play` to unpause!");
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

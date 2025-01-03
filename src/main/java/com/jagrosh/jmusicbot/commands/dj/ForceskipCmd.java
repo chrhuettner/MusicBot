@@ -32,7 +32,7 @@ public class ForceskipCmd extends DJCommand
 
     public ForceskipCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "skips the current song";
         this.bePlaying = true;
     }
@@ -47,8 +47,4 @@ public class ForceskipCmd extends DJCommand
         handler.getPlayer().stopTrack();
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

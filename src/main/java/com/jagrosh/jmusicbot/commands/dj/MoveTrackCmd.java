@@ -17,7 +17,7 @@ public class MoveTrackCmd extends DJCommand
 
     public MoveTrackCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "move a track in the current queue to a different position";
         this.arguments = "<from> <to>";
         this.bePlaying = true;
@@ -82,8 +82,4 @@ public class MoveTrackCmd extends DJCommand
         return (position < 1 || position > queue.size());
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

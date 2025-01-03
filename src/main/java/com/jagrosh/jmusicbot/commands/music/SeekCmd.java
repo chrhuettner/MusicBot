@@ -38,7 +38,7 @@ public class SeekCmd extends MusicCommand
 
     public SeekCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "seeks the current song";
         this.arguments = "[+ | -] <HH:MM:SS | MM:SS | SS>|<0h0m0s | 0m0s | 0s>";
         this.beListening = true;
@@ -104,8 +104,4 @@ public class SeekCmd extends MusicCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

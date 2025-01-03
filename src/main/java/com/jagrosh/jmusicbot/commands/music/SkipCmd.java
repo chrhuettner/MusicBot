@@ -32,7 +32,7 @@ public class SkipCmd extends MusicCommand
 
     public SkipCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "votes to skip the current song";
         this.beListening = true;
         this.bePlaying = true;
@@ -78,9 +78,4 @@ public class SkipCmd extends MusicCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
-    
 }

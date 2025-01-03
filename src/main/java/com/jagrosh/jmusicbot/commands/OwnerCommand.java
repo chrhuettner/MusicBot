@@ -21,8 +21,9 @@ package com.jagrosh.jmusicbot.commands;
  */
 public abstract class OwnerCommand extends AliasCommand
 {
-    public OwnerCommand()
+    public OwnerCommand(String commandName)
     {
+        super(commandName);
         this.category = new Category("Owner");
         this.ownerCommand = true;
     }

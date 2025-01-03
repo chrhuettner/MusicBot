@@ -30,7 +30,7 @@ public class StopCmd extends DJCommand
 
     public StopCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "stops the current song and clears the queue";
         this.bePlaying = false;
     }
@@ -44,8 +44,4 @@ public class StopCmd extends DJCommand
         event.reply(event.getClient().getSuccess()+" The player has stopped and the queue has been cleared.");
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

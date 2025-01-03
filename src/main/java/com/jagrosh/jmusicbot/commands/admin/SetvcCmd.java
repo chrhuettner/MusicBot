@@ -34,6 +34,7 @@ public class SetvcCmd extends AdminCommand
 
     public SetvcCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets the voice channel for playing music";
         this.arguments = "<channel|NONE>";
     }
@@ -67,8 +68,4 @@ public class SetvcCmd extends AdminCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

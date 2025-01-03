@@ -34,7 +34,7 @@ public class RemoveCmd extends MusicCommand
 
     public RemoveCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "removes a song from the queue";
         this.arguments = "<position|ALL>";
         this.beListening = true;
@@ -114,8 +114,5 @@ public class RemoveCmd extends MusicCommand
                 (u == null ? "someone" : "**" + u.getName() + "**") + ")");
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
+
 }

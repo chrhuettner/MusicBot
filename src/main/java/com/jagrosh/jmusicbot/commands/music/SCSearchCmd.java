@@ -27,13 +27,9 @@ public class SCSearchCmd extends SearchCmd
 
     public SCSearchCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.searchPrefix = "scsearch:";
         this.help = "searches Soundcloud for a provided query";
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

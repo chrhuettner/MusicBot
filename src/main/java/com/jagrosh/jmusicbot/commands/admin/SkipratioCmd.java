@@ -30,6 +30,7 @@ public class SkipratioCmd extends AdminCommand
 
     public SkipratioCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets a server-specific skip percentage";
         this.arguments = "<0 - 100>";
     }
@@ -55,8 +56,4 @@ public class SkipratioCmd extends AdminCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

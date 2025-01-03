@@ -30,6 +30,7 @@ public class SetnameCmd extends OwnerCommand
 
     public SetnameCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets the name of the bot";
         this.arguments = "<name>";
         this.guildOnly = false;
@@ -54,8 +55,4 @@ public class SetnameCmd extends OwnerCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

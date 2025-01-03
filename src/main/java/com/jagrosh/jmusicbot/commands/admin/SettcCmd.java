@@ -34,6 +34,7 @@ public class SettcCmd extends AdminCommand
 
     public SettcCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets the text channel for music commands";
         this.arguments = "<channel|NONE>";
     }
@@ -67,8 +68,4 @@ public class SettcCmd extends AdminCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

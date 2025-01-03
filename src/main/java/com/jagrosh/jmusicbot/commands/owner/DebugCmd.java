@@ -41,6 +41,7 @@ public class DebugCmd extends OwnerCommand
 
     public DebugCmd()
     {
+        super(COMMAND_NAME);
         this.help = "shows debug info";
         this.guildOnly = false;
         this.botConfig = BotConfig.getBotConfig();
@@ -86,8 +87,4 @@ public class DebugCmd extends OwnerCommand
             event.reply("Debug Information: " + sb.toString());
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

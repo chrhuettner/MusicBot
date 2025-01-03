@@ -30,6 +30,7 @@ public class SetgameCmd extends OwnerCommand
 
     public SetgameCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets the game the bot is playing";
         this.arguments = "[action] [game]";
         this.guildOnly = false;
@@ -56,10 +57,7 @@ public class SetgameCmd extends OwnerCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
+
     
     private class SetstreamCmd extends OwnerCommand
     {
@@ -67,6 +65,7 @@ public class SetgameCmd extends OwnerCommand
 
         private SetstreamCmd()
         {
+            super(COMMAND_NAME);
             this.aliases = new String[]{"twitch","streaming"};
             this.help = "sets the game the bot is playing to a stream";
             this.arguments = "<username> <game>";
@@ -94,10 +93,6 @@ public class SetgameCmd extends OwnerCommand
             }
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
     
     private class SetlistenCmd extends OwnerCommand
@@ -106,6 +101,7 @@ public class SetgameCmd extends OwnerCommand
 
         private SetlistenCmd()
         {
+            super(COMMAND_NAME);
             this.aliases = new String[]{"listening"};
             this.help = "sets the game the bot is listening to";
             this.arguments = "<title>";
@@ -130,10 +126,6 @@ public class SetgameCmd extends OwnerCommand
             }
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
     
     private class SetwatchCmd extends OwnerCommand
@@ -142,6 +134,7 @@ public class SetgameCmd extends OwnerCommand
 
         private SetwatchCmd()
         {
+            super(COMMAND_NAME);
             this.aliases = new String[]{"watching"};
             this.help = "sets the game the bot is watching";
             this.arguments = "<title>";
@@ -166,9 +159,5 @@ public class SetgameCmd extends OwnerCommand
             }
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
 }

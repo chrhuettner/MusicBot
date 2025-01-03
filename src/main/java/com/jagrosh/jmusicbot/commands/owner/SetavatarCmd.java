@@ -33,6 +33,7 @@ public class SetavatarCmd extends OwnerCommand
 
     public SetavatarCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets the avatar of the bot";
         this.arguments = "<url>";
         this.guildOnly = false;
@@ -66,8 +67,4 @@ public class SetavatarCmd extends OwnerCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

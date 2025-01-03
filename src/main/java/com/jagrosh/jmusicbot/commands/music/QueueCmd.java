@@ -45,7 +45,7 @@ public class QueueCmd extends MusicCommand
 
     public QueueCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "shows the current queue";
         this.arguments = "[pagenum]";
         this.bePlaying = true;
@@ -130,8 +130,5 @@ public class QueueCmd extends MusicCommand
                 .append(repeatmode.getEmoji() != null ? " | "+repeatmode.getEmoji() : "").toString());
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
+
 }

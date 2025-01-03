@@ -35,6 +35,7 @@ public class PlaylistCmd extends OwnerCommand
 
     public PlaylistCmd(Bot bot)
     {
+        super(COMMAND_NAME);
         this.bot = bot;
         this.guildOnly = false;
         this.arguments = "<append|delete|make|setdefault>";
@@ -58,10 +59,7 @@ public class PlaylistCmd extends OwnerCommand
         event.reply(builder.toString());
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
+
     
     public class MakelistCmd extends OwnerCommand 
     {
@@ -69,6 +67,7 @@ public class PlaylistCmd extends OwnerCommand
 
         public MakelistCmd()
         {
+            super(COMMAND_NAME);
             this.aliases = new String[]{"create"};
             this.help = "makes a new playlist";
             this.arguments = "<name>";
@@ -100,10 +99,6 @@ public class PlaylistCmd extends OwnerCommand
                 event.reply(event.getClient().getError()+" Playlist `"+pname+"` already exists!");
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
     
     public class DeletelistCmd extends OwnerCommand 
@@ -112,6 +107,7 @@ public class PlaylistCmd extends OwnerCommand
 
         public DeletelistCmd()
         {
+            super(COMMAND_NAME);
             this.aliases = new String[]{"remove"};
             this.help = "deletes an existing playlist";
             this.arguments = "<name>";
@@ -138,10 +134,6 @@ public class PlaylistCmd extends OwnerCommand
             }
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
     
     public class AppendlistCmd extends OwnerCommand 
@@ -150,6 +142,7 @@ public class PlaylistCmd extends OwnerCommand
 
         public AppendlistCmd()
         {
+            super(COMMAND_NAME);
             this.aliases = new String[]{"add"};
             this.help = "appends songs to an existing playlist";
             this.arguments = "<name> <URL> | <URL> | ...";
@@ -193,10 +186,6 @@ public class PlaylistCmd extends OwnerCommand
             }
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
     
     public class DefaultlistCmd extends AutoplaylistCmd 
@@ -205,16 +194,12 @@ public class PlaylistCmd extends OwnerCommand
 
         public DefaultlistCmd(Bot bot)
         {
-            super(bot);
+            super(bot, COMMAND_NAME);
             this.aliases = new String[]{"default"};
             this.arguments = "<playlistname|NONE>";
             this.guildOnly = true;
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
     
     public class ListCmd extends OwnerCommand 
@@ -223,6 +208,7 @@ public class PlaylistCmd extends OwnerCommand
 
         public ListCmd()
         {
+            super(COMMAND_NAME);
             this.aliases = new String[]{"available","list"};
             this.help = "lists all available playlists";
             this.guildOnly = true;
@@ -251,9 +237,5 @@ public class PlaylistCmd extends OwnerCommand
             }
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
 }

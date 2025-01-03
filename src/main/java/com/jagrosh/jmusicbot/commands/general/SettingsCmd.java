@@ -39,6 +39,7 @@ public class SettingsCmd extends AliasCommand
 
     public SettingsCmd()
     {
+        super(COMMAND_NAME);
         this.help = "shows the bots settings";
         this.guildOnly = true;
     }
@@ -74,8 +75,4 @@ public class SettingsCmd extends AliasCommand
         event.getChannel().sendMessage(builder.setEmbeds(ebuilder.build()).build()).queue();
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

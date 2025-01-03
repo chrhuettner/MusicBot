@@ -34,8 +34,9 @@ public abstract class MusicCommand extends AliasCommand
     protected boolean bePlaying;
     protected boolean beListening;
 
-    public MusicCommand(Bot bot)
+    public MusicCommand(String commandName, Bot bot)
     {
+        super(commandName);
         this.bot = bot;
         this.guildOnly = true;
         this.category = new Category("Music");

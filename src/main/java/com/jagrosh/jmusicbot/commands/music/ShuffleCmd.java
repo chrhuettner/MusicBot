@@ -30,7 +30,7 @@ public class ShuffleCmd extends MusicCommand
 
     public ShuffleCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "shuffles songs you have added";
         this.beListening = true;
         this.bePlaying = true;
@@ -55,8 +55,4 @@ public class ShuffleCmd extends MusicCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

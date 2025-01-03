@@ -52,7 +52,7 @@ public class PlayCmd extends MusicCommand
 
     public PlayCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.loadingEmoji = botConfig.getLoading();
         this.arguments = "<title|URL|subcommand>";
         this.help = "plays the provided song";
@@ -92,10 +92,7 @@ public class PlayCmd extends MusicCommand
         event.reply(loadingEmoji+" Loading... `["+args+"]`", m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), args, new ResultHandler(m,event,false)));
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
+
 
     private class ResultHandler implements AudioLoadResultHandler
     {
@@ -226,7 +223,7 @@ public class PlayCmd extends MusicCommand
 
         public PlaylistCmd(Bot bot)
         {
-            super(bot);
+            super(COMMAND_NAME, bot);
             this.aliases = new String[]{"pl"};
             this.arguments = "<name>";
             this.help = "plays the provided playlist";
@@ -266,9 +263,5 @@ public class PlayCmd extends MusicCommand
             });
         }
 
-        @Override
-        public String getCommandName() {
-            return COMMAND_NAME;
-        }
     }
 }

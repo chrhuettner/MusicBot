@@ -37,6 +37,7 @@ public class EvalCmd extends OwnerCommand
 
     public EvalCmd(Bot bot)
     {
+        super(COMMAND_NAME);
         this.bot = bot;
         this.help = "evaluates nashorn code";
         this.engine = BotConfig.getBotConfig().getEvalEngine();
@@ -70,9 +71,4 @@ public class EvalCmd extends OwnerCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
-    
 }

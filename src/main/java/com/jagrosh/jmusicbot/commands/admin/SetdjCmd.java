@@ -34,6 +34,7 @@ public class SetdjCmd extends AdminCommand
 
     public SetdjCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets the DJ role for certain music commands";
         this.arguments = "<rolename|NONE>";
     }
@@ -67,8 +68,4 @@ public class SetdjCmd extends AdminCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

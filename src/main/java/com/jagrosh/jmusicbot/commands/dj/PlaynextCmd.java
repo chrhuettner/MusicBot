@@ -41,7 +41,7 @@ public class PlaynextCmd extends DJCommand
 
     public PlaynextCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.loadingEmoji = botConfig.getLoading();
         this.arguments = "<title|URL>";
         this.help = "plays a single song next";
@@ -63,10 +63,6 @@ public class PlaynextCmd extends DJCommand
         event.reply(loadingEmoji+" Loading... `["+args+"]`", m -> bot.getPlayerManager().loadItemOrdered(event.getGuild(), args, new ResultHandler(m,event,false)));
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 
     private class ResultHandler implements AudioLoadResultHandler
     {

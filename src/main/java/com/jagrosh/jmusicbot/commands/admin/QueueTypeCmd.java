@@ -32,6 +32,7 @@ public class QueueTypeCmd extends AdminCommand
 
     public QueueTypeCmd()
     {
+        super(COMMAND_NAME);
         this.help = "changes the queue type";
         this.arguments = "[" + String.join("|", QueueType.getNames()) + "]";
     }
@@ -72,8 +73,4 @@ public class QueueTypeCmd extends AdminCommand
         event.reply(value.getEmoji() + " Queue type was set to `" + value.getUserFriendlyName() + "`.");
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

@@ -31,7 +31,7 @@ public class RepeatCmd extends DJCommand
 
     public RepeatCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "re-adds music to the queue when finished";
         this.arguments = "[off|all|single]";
         this.guildOnly = true;
@@ -75,8 +75,4 @@ public class RepeatCmd extends DJCommand
     @Override
     public void doCommand(CommandEvent event) { /* Intentionally Empty */ }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

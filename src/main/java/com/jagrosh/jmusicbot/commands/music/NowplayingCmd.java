@@ -32,7 +32,7 @@ public class NowplayingCmd extends MusicCommand
 
     public NowplayingCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "shows the song that is currently playing";
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
@@ -53,8 +53,4 @@ public class NowplayingCmd extends MusicCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

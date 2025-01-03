@@ -32,6 +32,12 @@ public class AutoplaylistCmd extends OwnerCommand
 
     public AutoplaylistCmd(Bot bot)
     {
+        this(bot, COMMAND_NAME);
+    }
+
+    public AutoplaylistCmd(Bot bot, String name)
+    {
+        super(name);
         this.bot = bot;
         this.guildOnly = true;
         this.arguments = "<name|NONE>";
@@ -66,8 +72,4 @@ public class AutoplaylistCmd extends OwnerCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

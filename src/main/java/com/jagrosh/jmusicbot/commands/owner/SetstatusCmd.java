@@ -30,6 +30,7 @@ public class SetstatusCmd extends OwnerCommand
 
     public SetstatusCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets the status the bot displays";
         this.arguments = "<status>";
         this.guildOnly = false;
@@ -54,8 +55,4 @@ public class SetstatusCmd extends OwnerCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

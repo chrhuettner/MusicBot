@@ -35,7 +35,7 @@ public class LyricsCmd extends MusicCommand
 
     public LyricsCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.arguments = "[song name]";
         this.help = "shows the lyrics of a song";
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
@@ -98,8 +98,4 @@ public class LyricsCmd extends MusicCommand
         });
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

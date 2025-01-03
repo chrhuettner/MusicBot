@@ -30,6 +30,7 @@ public class PrefixCmd extends AdminCommand
 
     public PrefixCmd()
     {
+        super(COMMAND_NAME);
         this.help = "sets a server-specific prefix";
         this.arguments = "<prefix|NONE>";
     }
@@ -56,8 +57,4 @@ public class PrefixCmd extends AdminCommand
         }
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }

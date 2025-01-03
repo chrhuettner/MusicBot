@@ -30,7 +30,7 @@ public class SkiptoCmd extends DJCommand
 
     public SkiptoCmd(Bot bot)
     {
-        super(bot);
+        super(COMMAND_NAME, bot);
         this.help = "skips to the specified song";
         this.arguments = "<position>";
         this.bePlaying = true;
@@ -60,8 +60,4 @@ public class SkiptoCmd extends DJCommand
         handler.getPlayer().stopTrack();
     }
 
-    @Override
-    public String getCommandName() {
-        return COMMAND_NAME;
-    }
 }
