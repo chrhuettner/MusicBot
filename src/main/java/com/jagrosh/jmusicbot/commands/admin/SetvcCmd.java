@@ -32,7 +32,7 @@ public class SetvcCmd extends AdminCommand
 {
     private static final String COMMAND_NAME = "setvc";
 
-    public SetvcCmd(Bot bot)
+    public SetvcCmd()
     {
         this.help = "sets the voice channel for playing music";
         this.arguments = "<channel|NONE>";

@@ -30,7 +30,7 @@ public class QueueTypeCmd extends AdminCommand
 {
     private static final String COMMAND_NAME = "queuetype";
 
-    public QueueTypeCmd(Bot bot)
+    public QueueTypeCmd()
     {
         this.help = "changes the queue type";
         this.arguments = "[" + String.join("|", QueueType.getNames()) + "]";

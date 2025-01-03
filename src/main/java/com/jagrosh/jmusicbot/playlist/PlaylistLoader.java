@@ -242,11 +242,6 @@ public class PlaylistLoader
         {
             shuffle(tracks);
         }
-        
-        public String getName()
-        {
-            return name;
-        }
 
         public List<String> getItems()
         {

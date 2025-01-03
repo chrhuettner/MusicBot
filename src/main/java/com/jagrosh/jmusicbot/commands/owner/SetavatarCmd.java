@@ -31,7 +31,7 @@ public class SetavatarCmd extends OwnerCommand
 {
     private static final String COMMAND_NAME = "setavatar";
 
-    public SetavatarCmd(Bot bot)
+    public SetavatarCmd()
     {
         this.help = "sets the avatar of the bot";
         this.arguments = "<url>";

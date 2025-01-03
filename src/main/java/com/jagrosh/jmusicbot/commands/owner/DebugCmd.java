@@ -34,16 +34,13 @@ public class DebugCmd extends OwnerCommand
 {
     private final static String[] PROPERTIES = {"java.version", "java.vm.name", "java.vm.specification.version", 
         "java.runtime.name", "java.runtime.version", "java.specification.version",  "os.arch", "os.name"};
-    
-    private final Bot bot;
 
     private static final String COMMAND_NAME = "debug";
 
     private BotConfig botConfig;
 
-    public DebugCmd(Bot bot)
+    public DebugCmd()
     {
-        this.bot = bot;
         this.help = "shows debug info";
         this.guildOnly = false;
         this.botConfig = BotConfig.getBotConfig();

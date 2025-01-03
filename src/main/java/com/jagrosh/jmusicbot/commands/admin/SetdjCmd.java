@@ -32,7 +32,7 @@ public class SetdjCmd extends AdminCommand
 {
     private static final String COMMAND_NAME = "setdj";
 
-    public SetdjCmd(Bot bot)
+    public SetdjCmd()
     {
         this.help = "sets the DJ role for certain music commands";
         this.arguments = "<rolename|NONE>";

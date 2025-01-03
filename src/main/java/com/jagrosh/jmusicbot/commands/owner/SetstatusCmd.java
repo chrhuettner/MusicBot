@@ -28,7 +28,7 @@ public class SetstatusCmd extends OwnerCommand
 {
     private static final String COMMAND_NAME = "setstatus";
 
-    public SetstatusCmd(Bot bot)
+    public SetstatusCmd()
     {
         this.help = "sets the status the bot displays";
         this.arguments = "<status>";

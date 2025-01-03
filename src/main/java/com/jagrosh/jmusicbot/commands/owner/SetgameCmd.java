@@ -28,7 +28,7 @@ public class SetgameCmd extends OwnerCommand
 {
     private static final String COMMAND_NAME = "setgame";
 
-    public SetgameCmd(Bot bot)
+    public SetgameCmd()
     {
         this.help = "sets the game the bot is playing";
         this.arguments = "[action] [game]";

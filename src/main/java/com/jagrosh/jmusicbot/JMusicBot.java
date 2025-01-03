@@ -73,7 +73,7 @@ public class JMusicBot
     private static void startBot() {
         Prompt prompt = createPrompt();
         config = loadConfig(prompt);
-        if (loadConfig(prompt) == null) return;
+        if (config == null) return;
 
         setLogLevel();
 
@@ -204,10 +204,10 @@ public class JMusicBot
                         new SearchCmd(bot), new SCSearchCmd(bot), new SeekCmd(bot), new ShuffleCmd(bot), new SkipCmd(bot),
                         new ForceRemoveCmd(bot), new ForceskipCmd(bot), new MoveTrackCmd(bot), new PauseCmd(bot),
                         new PlaynextCmd(bot), new RepeatCmd(bot), new SkiptoCmd(bot), new StopCmd(bot), new VolumeCmd(bot),
-                        new PrefixCmd(bot), new QueueTypeCmd(bot), new SetdjCmd(bot), new SkipratioCmd(bot),
-                        new SettcCmd(bot), new SetvcCmd(bot),
-                        new AutoplaylistCmd(bot), new DebugCmd(bot), new PlaylistCmd(bot),
-                        new SetavatarCmd(bot), new SetgameCmd(bot), new SetnameCmd(bot), new SetstatusCmd(bot), new ShutdownCmd(bot));
+                        new PrefixCmd(), new QueueTypeCmd(), new SetdjCmd(), new SkipratioCmd(),
+                        new SettcCmd(), new SetvcCmd(),
+                        new AutoplaylistCmd(bot), new DebugCmd(), new PlaylistCmd(bot),
+                        new SetavatarCmd(), new SetgameCmd(), new SetnameCmd(), new SetstatusCmd(), new ShutdownCmd(bot));
 
         if (config.useEval()) cb.addCommand(new EvalCmd(bot));
         if (config.getStatus() != OnlineStatus.UNKNOWN) cb.setStatus(config.getStatus());

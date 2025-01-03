@@ -28,7 +28,7 @@ public class PrefixCmd extends AdminCommand
 {
     private static final String COMMAND_NAME = "prefix";
 
-    public PrefixCmd(Bot bot)
+    public PrefixCmd()
     {
         this.help = "sets a server-specific prefix";
         this.arguments = "<prefix|NONE>";

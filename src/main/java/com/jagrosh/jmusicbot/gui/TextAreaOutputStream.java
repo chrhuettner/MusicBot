@@ -43,10 +43,6 @@ public TextAreaOutputStream(JTextArea txtara, int maxlin) {
     appender=new Appender(txtara,maxlin);
     }
 
-/** Clear the current console text area. */
-public synchronized void clear() {
-    if(appender!=null) { appender.clear(); }
-    }
 
 @Override
 public synchronized void close() {
@@ -76,10 +72,10 @@ public synchronized void write(byte[] ba,int str,int len) {
 
 //@edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
 static private String bytesToString(byte[] ba, int str, int len) {
-    try { 
-        return new String(ba,str,len,"UTF-8"); 
-    } catch(UnsupportedEncodingException thr) { 
-        return new String(ba,str,len); 
+    try {
+        return new String(ba,str,len,"UTF-8");
+    } catch(UnsupportedEncodingException thr) {
+        return new String(ba,str,len);
     } // all JVMs are required to support UTF-8
     }
 
@@ -92,7 +88,7 @@ static private String bytesToString(byte[] ba, int str, int len) {
     {
     static private final String         EOL1="\n";
     static private final String         EOL2=System.getProperty("line.separator",EOL1);
-    
+
     private final JTextArea             textArea;
     private final int                   maxLines;                                                   // maximum lines allowed in text area
     private final LinkedList<Integer>   lengths;                                                    // length of lines within text area
@@ -115,9 +111,9 @@ static private String bytesToString(byte[] ba, int str, int len) {
 
     private synchronized void append(String val) {
         values.add(val);
-        if(queue) { 
-            queue=false; 
-            EventQueue.invokeLater(this); 
+        if(queue) {
+            queue=false;
+            EventQueue.invokeLater(this);
         }
         }
 
@@ -126,9 +122,9 @@ static private String bytesToString(byte[] ba, int str, int len) {
         curLength=0;
         lengths.clear();
         values.clear();
-        if(queue) { 
-            queue=false; 
-            EventQueue.invokeLater(this); 
+        if(queue) {
+            queue=false;
+            EventQueue.invokeLater(this);
         }
         }
 

@@ -19,7 +19,6 @@ import com.jagrosh.jmusicbot.utils.TimeUtil;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.jagrosh.jmusicbot.queue.Queueable;
-import net.dv8tion.jda.api.entities.User;
 
 /**
  *
@@ -49,11 +48,6 @@ public class QueuedTrack implements Queueable
     public AudioTrack getTrack()
     {
         return track;
-    }
-
-    public RequestMetadata getRequestMetadata()
-    {
-        return requestMetadata;
     }
 
     @Override

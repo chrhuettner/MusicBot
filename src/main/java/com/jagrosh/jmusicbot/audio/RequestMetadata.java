@@ -47,23 +47,20 @@ public class RequestMetadata
 
     public static RequestMetadata fromResultHandler(AudioTrack track, CommandEvent event)
     {
-        return new RequestMetadata(event.getAuthor(), new RequestInfo(event.getArgs(), track.getInfo().uri));
+        return new RequestMetadata(event.getAuthor(), new RequestInfo(event.getArgs()));
     }
     
     public static class RequestInfo
     {
-        public final String query, url;
         public final long startTimestamp;
 
-        public RequestInfo(String query, String url)
+        public RequestInfo(String query)
         {
-            this(query, url, tryGetTimestamp(query));
+            this(tryGetTimestamp(query));
         }
 
-        private RequestInfo(String query, String url, long startTimestamp)
+        private RequestInfo(long startTimestamp)
         {
-            this.url = url;
-            this.query = query;
             this.startTimestamp = startTimestamp;
         }
 

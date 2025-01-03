@@ -28,7 +28,7 @@ public class SetnameCmd extends OwnerCommand
 {
     private static final String COMMAND_NAME = "setname";
 
-    public SetnameCmd(Bot bot)
+    public SetnameCmd()
     {
         this.help = "sets the name of the bot";
         this.arguments = "<name>";
