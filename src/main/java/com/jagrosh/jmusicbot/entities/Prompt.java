@@ -63,58 +63,59 @@ public class Prompt
     {
         return nogui;
     }
-    
-    public void alert(Level level, String context, String message)
-    {
-        if(nogui)
-        {
-            Logger log = LoggerFactory.getLogger(context);
-            switch(level)
-            {
-                case INFO: 
-                    log.info(message); 
-                    break;
-                case WARNING: 
-                    log.warn(message); 
-                    break;
-                case ERROR: 
-                    log.error(message); 
-                    break;
-                default: 
-                    log.info(message); 
-                    break;
-            }
-        }
-        else
-        {
-            try 
-            {
-                int option = 0;
-                switch(level)
-                {
-                    case INFO: 
-                        option = JOptionPane.INFORMATION_MESSAGE; 
-                        break;
-                    case WARNING: 
-                        option = JOptionPane.WARNING_MESSAGE; 
-                        break;
-                    case ERROR: 
-                        option = JOptionPane.ERROR_MESSAGE; 
-                        break;
-                    default:
-                        option = JOptionPane.PLAIN_MESSAGE;
-                        break;
-                }
-                JOptionPane.showMessageDialog(null, "<html><body><p style='width: 400px;'>"+message, title, option);
-            }
-            catch(Exception e) 
-            {
-                nogui = true;
-                alert(Level.WARNING, context, noguiMessage);
-                alert(level, context, message);
-            }
+
+    public void alert(Level level, String context, String message) {
+        if (nogui) {
+            logMessage(level, context, message);
+        } else {
+            showGuiAlert(level, message, context);
         }
     }
+
+    private void logMessage(Level level, String context, String message) {
+        Logger log = LoggerFactory.getLogger(context);
+        switch (level) {
+            case WARNING:
+                log.warn(message);
+                break;
+            case ERROR:
+                log.error(message);
+                break;
+            case INFO:
+            default:
+                log.info(message);
+                break;
+        }
+    }
+
+    private void showGuiAlert(Level level, String message, String context) {
+        try {
+            int option = getGuiMessageType(level);
+            JOptionPane.showMessageDialog(null, "<html><body><p style='width: 400px;'>" + message, title, option);
+        } catch (Exception e) {
+            handleGuiFailure(level, context, message);
+        }
+    }
+
+    private int getGuiMessageType(Level level) {
+        switch (level) {
+            case INFO:
+                return JOptionPane.INFORMATION_MESSAGE;
+            case WARNING:
+                return JOptionPane.WARNING_MESSAGE;
+            case ERROR:
+                return JOptionPane.ERROR_MESSAGE;
+            default:
+                return JOptionPane.PLAIN_MESSAGE;
+        }
+    }
+
+    private void handleGuiFailure(Level level, String context, String message) {
+        nogui = true;
+        alert(Level.WARNING, context, noguiMessage);
+        alert(level, context, message);
+    }
+
     
     public String prompt(String content)
     {

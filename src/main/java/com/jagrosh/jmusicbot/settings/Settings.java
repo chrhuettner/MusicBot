@@ -31,7 +31,7 @@ import org.json.JSONObject;
  * @author John Grosh <john.a.grosh@gmail.com>
  */
 public class Settings implements GuildSettingsProvider {
-    private final SettingsManager manager;
+    private final SettingsWriter settingsWriter;
     protected long textId;
     protected long voiceId;
     protected long roleId;
@@ -42,8 +42,8 @@ public class Settings implements GuildSettingsProvider {
     private String prefix;
     private double skipRatio;
 
-    public Settings(SettingsManager manager, JSONObject jsonObject) {
-        this.manager = manager;
+    public Settings(SettingsWriter settingsWriter, JSONObject jsonObject) {
+        this.settingsWriter = settingsWriter;
         try {
             this.textId = Long.parseLong(jsonObject.has("text_channel_id") ? jsonObject.getString("text_channel_id") : "0");
         } catch (NumberFormatException e) {
@@ -67,8 +67,8 @@ public class Settings implements GuildSettingsProvider {
         this.queueType = jsonObject.has("queue_type") ? jsonObject.getEnum(QueueType.class, "queue_type") : QueueType.FAIR;
     }
 
-    public Settings(SettingsManager manager) {
-        this.manager = manager;
+    public Settings(SettingsWriter settingsWriter) {
+        this.settingsWriter = settingsWriter;
         this.textId = 0;
         this.voiceId = 0;
         this.roleId = 0;
@@ -125,46 +125,46 @@ public class Settings implements GuildSettingsProvider {
     // Setters
     public void setTextChannel(TextChannel tc) {
         this.textId = tc == null ? 0 : tc.getIdLong();
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setVoiceChannel(VoiceChannel vc) {
         this.voiceId = vc == null ? 0 : vc.getIdLong();
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setDJRole(Role role) {
         this.roleId = role == null ? 0 : role.getIdLong();
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setVolume(int volume) {
         this.volume = volume;
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setDefaultPlaylist(String defaultPlaylist) {
         this.defaultPlaylist = defaultPlaylist;
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setRepeatMode(RepeatMode mode) {
         this.repeatMode = mode;
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setSkipRatio(double skipRatio) {
         this.skipRatio = skipRatio;
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 
     public void setQueueType(QueueType queueType) {
         this.queueType = queueType;
-        this.manager.writeSettings();
+        this.settingsWriter.writeSettings();
     }
 }

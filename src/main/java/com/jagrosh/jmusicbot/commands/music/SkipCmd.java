@@ -42,43 +42,74 @@ public class SkipCmd extends MusicCommand
     }
 
     @Override
-    public void doCommand(CommandEvent event) 
-    {
-        AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
+    public void doCommand(CommandEvent event) {
+        AudioHandler handler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
         RequestMetadata rm = handler.getRequestMetadata();
-        double skipRatio = settingsManager.getSettings(event.getGuild()).getSkipRatio();
-        if(skipRatio == -1) {
-          skipRatio = botConfig.getSkipRatio();
-        }
-        if(event.getAuthor().getIdLong() == rm.getOwner() || skipRatio == 0)
-        {
-            event.reply(event.getClient().getSuccess()+" Skipped **"+handler.getPlayer().getPlayingTrack().getInfo().title+"**");
-            handler.getPlayer().stopTrack();
-        }
-        else
-        {
-            int listeners = (int)event.getSelfMember().getVoiceState().getChannel().getMembers().stream()
-                    .filter(m -> !m.getUser().isBot() && !m.getVoiceState().isDeafened()).count();
-            String msg;
-            if(handler.getVotes().contains(event.getAuthor().getId()))
-                msg = event.getClient().getWarning()+" You already voted to skip this song `[";
-            else
-            {
-                msg = event.getClient().getSuccess()+" You voted to skip the song `[";
-                handler.getVotes().add(event.getAuthor().getId());
-            }
-            int skippers = (int)event.getSelfMember().getVoiceState().getChannel().getMembers().stream()
-                    .filter(m -> handler.getVotes().contains(m.getUser().getId())).count();
-            int required = (int)Math.ceil(listeners * skipRatio);
-            msg += skippers + " votes, " + required + "/" + listeners + " needed]`";
-            if(skippers>=required)
-            {
-                msg += "\n" + event.getClient().getSuccess() + " Skipped **" + handler.getPlayer().getPlayingTrack().getInfo().title
-                    + "** " + (rm.getOwner() == 0L ? "(autoplay)" : "(requested by **" + FormatUtil.formatUsername(rm.user) + "**)");
-                handler.getPlayer().stopTrack();
-            }
-            event.reply(msg);
+        double skipRatio = getSkipRatio(event);
+
+        if (isRequesterOrSkipFree(event, rm, skipRatio)) {
+            skipTrack(event, handler);
+        } else {
+            processSkipVote(event, handler, skipRatio);
         }
     }
+
+    private double getSkipRatio(CommandEvent event) {
+        double skipRatio = settingsManager.getSettings(event.getGuild()).getSkipRatio();
+        return (skipRatio == -1) ? botConfig.getSkipRatio() : skipRatio;
+    }
+
+    private boolean isRequesterOrSkipFree(CommandEvent event, RequestMetadata rm, double skipRatio) {
+        return event.getAuthor().getIdLong() == rm.getOwner() || skipRatio == 0;
+    }
+
+    private void skipTrack(CommandEvent event, AudioHandler handler) {
+        event.reply(event.getClient().getSuccess() + " Skipped **" + handler.getPlayer().getPlayingTrack().getInfo().title + "**");
+        handler.getPlayer().stopTrack();
+    }
+
+    private void processSkipVote(CommandEvent event, AudioHandler handler, double skipRatio) {
+        int listeners = getActiveListeners(event);
+        int requiredVotes = (int) Math.ceil(listeners * skipRatio);
+        int currentVotes = updateVoteCount(event, handler);
+
+        String voteMessage = formatVoteMessage(event, handler, currentVotes, requiredVotes, listeners);
+
+        if (currentVotes >= requiredVotes) {
+            voteMessage += "\n" + event.getClient().getSuccess() + " Skipped **" + handler.getPlayer().getPlayingTrack().getInfo().title
+                    + "** " + getRequesterInfo(handler.getRequestMetadata());
+            handler.getPlayer().stopTrack();
+        }
+
+        event.reply(voteMessage);
+    }
+
+    private int getActiveListeners(CommandEvent event) {
+        return (int) event.getSelfMember().getVoiceState().getChannel().getMembers().stream()
+                .filter(m -> !m.getUser().isBot() && !m.getVoiceState().isDeafened())
+                .count();
+    }
+
+    private int updateVoteCount(CommandEvent event, AudioHandler handler) {
+        if (!handler.getVotes().contains(event.getAuthor().getId())) {
+            handler.getVotes().add(event.getAuthor().getId());
+        }
+        return (int) event.getSelfMember().getVoiceState().getChannel().getMembers().stream()
+                .filter(m -> handler.getVotes().contains(m.getUser().getId()))
+                .count();
+    }
+
+    private String formatVoteMessage(CommandEvent event, AudioHandler handler, int skippers, int required, int listeners) {
+        String prefix = handler.getVotes().contains(event.getAuthor().getId())
+                ? event.getClient().getWarning() + " You already voted to skip this song `["
+                : event.getClient().getSuccess() + " You voted to skip the song `[";
+
+        return prefix + skippers + " votes, " + required + "/" + listeners + " needed]`";
+    }
+
+    private String getRequesterInfo(RequestMetadata rm) {
+        return (rm.getOwner() == 0L) ? "(autoplay)" : "(requested by **" + FormatUtil.formatUsername(rm.user) + "**)";
+    }
+
 
 }
