@@ -36,9 +36,8 @@ public class RepeatCmd extends DJCommand
         this.guildOnly = true;
     }
     
-    // override musiccommand's execute because we don't actually care where this is used
     @Override
-    protected void execute(CommandEvent event) 
+    public void doCommand(CommandEvent event)
     {
         String args = event.getArgs();
         RepeatMode value;
@@ -70,8 +69,5 @@ public class RepeatCmd extends DJCommand
         settings.setRepeatMode(value);
         event.replySuccess("Repeat mode is now `"+value.getUserFriendlyName()+"`");
     }
-
-    @Override
-    public void doCommand(CommandEvent event) { /* Intentionally Empty */ }
 
 }
