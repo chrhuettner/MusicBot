@@ -21,6 +21,7 @@ import com.jagrosh.jmusicbot.audio.PlayerManager;
 import com.jagrosh.jmusicbot.audio.QueuedTrack;
 import com.jagrosh.jmusicbot.audio.RequestMetadata;
 import com.jagrosh.jmusicbot.commands.DJCommand;
+import com.jagrosh.jmusicbot.commands.LoadSingleHandler;
 import com.jagrosh.jmusicbot.utils.FormatUtil;
 import com.jagrosh.jmusicbot.utils.TimeUtil;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -67,32 +68,23 @@ public class PlaynextCmd extends DJCommand
     }
 
 
-    private class ResultHandler implements AudioLoadResultHandler
+    private class ResultHandler extends LoadSingleHandler implements AudioLoadResultHandler
     {
-        private final Message m;
-        private final CommandEvent event;
-        private final boolean ytsearch;
-        
         private ResultHandler(Message m, CommandEvent event, boolean ytsearch)
         {
-            this.m = m;
-            this.event = event;
-            this.ytsearch = ytsearch;
+            super(m, event, ytsearch);
         }
-        
+
         private void loadSingle(AudioTrack track)
         {
-            if(botConfig.isTooLong(track))
+            if(super.checkTrackLength(track))
             {
-                m.editMessage(FormatUtil.filter(event.getClient().getWarning()+" This track (**"+track.getInfo().title+"**) is longer than the allowed maximum: `"
-                        + TimeUtil.formatTime(track.getDuration())+"` > `"+ TimeUtil.formatTime(botConfig.getMaxSeconds()*1000)+"`")).queue();
-                return;
+                AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
+                int pos = handler.addTrackToFront(new QueuedTrack(track, RequestMetadata.fromResultHandler(event)))+1;
+                String addMsg = FormatUtil.filter(event.getClient().getSuccess()+" Added **"+track.getInfo().title
+                        +"** (`"+ TimeUtil.formatTime(track.getDuration())+"`) "+(pos==0?"to begin playing":" to the queue at position "+pos));
+                m.editMessage(addMsg).queue();
             }
-            AudioHandler handler = (AudioHandler)event.getGuild().getAudioManager().getSendingHandler();
-            int pos = handler.addTrackToFront(new QueuedTrack(track, RequestMetadata.fromResultHandler(event)))+1;
-            String addMsg = FormatUtil.filter(event.getClient().getSuccess()+" Added **"+track.getInfo().title
-                    +"** (`"+ TimeUtil.formatTime(track.getDuration())+"`) "+(pos==0?"to begin playing":" to the queue at position "+pos));
-            m.editMessage(addMsg).queue();
         }
         
         @Override
