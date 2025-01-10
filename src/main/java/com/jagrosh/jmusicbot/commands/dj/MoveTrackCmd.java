@@ -23,58 +23,56 @@ public class MoveTrackCmd extends DJCommand
     }
 
     @Override
-    public void doCommand(CommandEvent event)
-    {
-        int from;
-        int to;
-
+    public void doCommand(CommandEvent event) {
         String[] parts = event.getArgs().split("\\s+", 2);
-        if(parts.length < 2)
-        {
+        if (parts.length < 2) {
             event.replyError("Please include two valid indexes.");
             return;
         }
 
-        try
-        {
-            // Validate the args
-            from = Integer.parseInt(parts[0]);
-            to = Integer.parseInt(parts[1]);
-        }
-        catch (NumberFormatException e)
-        {
-            event.replyError("Please provide two valid indexes.");
-            return;
-        }
+        int from = parseIndex(parts[0], event);
+        int to = parseIndex(parts[1], event);
 
-        if (from == to)
-        {
+        if (from == to) {
             event.replyError("Can't move a track to the same position.");
             return;
         }
 
-        // Validate that from and to are available
         AudioHandler handler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
         AbstractQueue<QueuedTrack> queue = handler.getQueue();
-        if (isUnavailablePosition(queue, from))
-        {
-            String reply = String.format("`%d` is not a valid position in the queue!", from);
-            event.replyError(reply);
-            return;
-        }
-        if (isUnavailablePosition(queue, to))
-        {
-            String reply = String.format("`%d` is not a valid position in the queue!", to);
-            event.replyError(reply);
-            return;
+
+        if (!isValidPosition(queue, from, event) || !isValidPosition(queue, to, event)) {
+            return; // Error message already sent in isValidPosition
         }
 
-        // Move the track
+        moveTrackInQueue(queue, from, to, event);
+    }
+
+    private int parseIndex(String indexStr, CommandEvent event) {
+        try {
+            return Integer.parseInt(indexStr);
+        } catch (NumberFormatException e) {
+            event.replyError("Please provide two valid indexes.");
+            return -1; // Indicating an invalid index
+        }
+    }
+
+    private boolean isValidPosition(AbstractQueue<QueuedTrack> queue, int position, CommandEvent event) {
+        if (isUnavailablePosition(queue, position)) {
+            String reply = String.format("`%d` is not a valid position in the queue!", position);
+            event.replyError(reply);
+            return false;
+        }
+        return true;
+    }
+
+    private void moveTrackInQueue(AbstractQueue<QueuedTrack> queue, int from, int to, CommandEvent event) {
         QueuedTrack track = queue.moveItem(from - 1, to - 1);
         String trackTitle = track.getTrack().getInfo().title;
         String reply = String.format("Moved **%s** from position `%d` to `%d`.", trackTitle, from, to);
         event.replySuccess(reply);
     }
+
 
     private static boolean isUnavailablePosition(AbstractQueue<QueuedTrack> queue, int position)
     {
