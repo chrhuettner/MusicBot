@@ -32,6 +32,11 @@
       <option name="url" value="https://jcenter.bintray.com" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Repository Switchboard" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="m2.duncte123.dev" />
       <option name="name" value="m2-duncte123" />
       <option name="url" value="https://m2.duncte123.dev/releases" />

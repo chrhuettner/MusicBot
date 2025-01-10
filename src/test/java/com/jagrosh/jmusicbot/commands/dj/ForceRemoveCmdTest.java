@@ -5,19 +5,14 @@ import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import com.jagrosh.jmusicbot.BotConfig;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.audio.QueuedTrack;
-import com.jagrosh.jmusicbot.queue.AbstractQueue;
 import com.jagrosh.jmusicbot.queue.FairQueue;
-import com.jagrosh.jmusicbot.queue.LinearQueue;
-import com.jagrosh.jmusicbot.queue.Queueable;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 import java.util.ArrayList;
@@ -29,15 +24,21 @@ import static org.mockito.Mockito.*;
 public class ForceRemoveCmdTest {
     private static ForceRemoveCmd cmd;
     private static BotConfig botConfig;
+    private static MockedStatic<BotConfig> botConfigMockedStatic;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
-        MockedStatic<BotConfig> botConfigMockedStatic = mockStatic(BotConfig.class);
+        botConfigMockedStatic = mockStatic(BotConfig.class);
         botConfig = mock(BotConfig.class);
         botConfigMockedStatic.when(BotConfig::getInstance).thenReturn(botConfig);
     }
 
-    @Before
+    @AfterAll
+    public static void afterClass() {
+        botConfigMockedStatic.close();
+    }
+
+    @BeforeEach
     public void resetCmd() {
         cmd = new ForceRemoveCmd();
     }
