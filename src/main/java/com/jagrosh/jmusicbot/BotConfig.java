@@ -23,6 +23,8 @@ import com.typesafe.config.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
@@ -40,8 +42,9 @@ public class BotConfig
     
     private Path path = null;
     private String token, prefix, altprefix, helpWord, playlistsFolder, logLevel,
-            successEmoji, warningEmoji, errorEmoji, loadingEmoji, searchingEmoji,
             evalEngine;
+
+    private HashMap<String, String> emojiMap;
     private boolean stayInChannel, songInGame, npImages, updatealerts, useEval, dbots;
     private long owner, maxSeconds, aloneTimeUntilStop;
     private int maxYTPlaylistPages;
@@ -53,7 +56,8 @@ public class BotConfig
     private boolean valid = false;
 
     private static BotConfig botConfig;
-    
+
+
     private BotConfig(Prompt prompt)
     {
         this.prompt = prompt;
@@ -94,16 +98,18 @@ public class BotConfig
     }
 
     private void setConfigValues(Config config) {
+        emojiMap = new HashMap<>();
+        emojiMap.put("success", config.getString("success"));
+        emojiMap.put("warning", config.getString("warning"));
+        emojiMap.put("error", config.getString("error"));
+        emojiMap.put("loading", config.getString("loading"));
+        emojiMap.put("searching", config.getString("searching"));
+
         token = config.getString("token");
         prefix = config.getString("prefix");
         altprefix = config.getString("altprefix");
         helpWord = config.getString("help");
         owner = config.getLong("owner");
-        successEmoji = config.getString("success");
-        warningEmoji = config.getString("warning");
-        errorEmoji = config.getString("error");
-        loadingEmoji = config.getString("loading");
-        searchingEmoji = config.getString("searching");
         game = OtherUtil.parseGame(config.getString("game"));
         status = OtherUtil.parseStatus(config.getString("status"));
         stayInChannel = config.getBoolean("stayinchannel");
@@ -242,27 +248,27 @@ public class BotConfig
     
     public String getSuccess()
     {
-        return successEmoji;
+        return emojiMap.get("success");
     }
     
     public String getWarning()
     {
-        return warningEmoji;
+        return emojiMap.get("warning");
     }
     
     public String getError()
     {
-        return errorEmoji;
+        return emojiMap.get("error");
     }
     
     public String getLoading()
     {
-        return loadingEmoji;
+        return emojiMap.get("loading");
     }
     
     public String getSearching()
     {
-        return searchingEmoji;
+        return emojiMap.get("searching");
     }
     
     public Activity getGame()
