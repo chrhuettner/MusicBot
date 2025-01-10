@@ -16,6 +16,7 @@
 package com.jagrosh.jmusicbot.commands.music;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jlyrics.Lyrics;
 import com.jagrosh.jlyrics.LyricsClient;
 import com.jagrosh.jmusicbot.audio.AudioHandler;
 import com.jagrosh.jmusicbot.commands.MusicCommand;
@@ -23,17 +24,14 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 
 /**
- *
  * @author John Grosh (john.a.grosh@gmail.com)
  */
-public class LyricsCmd extends MusicCommand
-{
+public class LyricsCmd extends MusicCommand {
     private final LyricsClient client = new LyricsClient();
 
     private static final String COMMAND_NAME = "lyrics";
 
-    public LyricsCmd()
-    {
+    public LyricsCmd() {
         super(COMMAND_NAME);
         this.arguments = "[song name]";
         this.help = "shows the lyrics of a song";
@@ -41,60 +39,76 @@ public class LyricsCmd extends MusicCommand
     }
 
     @Override
-    public void doCommand(CommandEvent event)
-    {
-        String title;
-        if(event.getArgs().isEmpty())
-        {
+    public void doCommand(CommandEvent event) {
+        String title = getTitleFromEvent(event);
+        if (title == null) {
+            return; // Error already handled in getTitleFromEvent
+        }
+
+        event.getChannel().sendTyping().queue();
+        fetchAndReplyWithLyrics(event, title);
+    }
+
+    private String getTitleFromEvent(CommandEvent event) {
+        if (event.getArgs().isEmpty()) {
             AudioHandler sendingHandler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
-            if (sendingHandler.isMusicPlaying(event.getJDA()))
-                title = sendingHandler.getPlayer().getPlayingTrack().getInfo().title;
-            else
-            {
+            if (sendingHandler.isMusicPlaying(event.getJDA())) {
+                return sendingHandler.getPlayer().getPlayingTrack().getInfo().title;
+            } else {
                 event.replyError("There must be music playing to use that!");
-                return;
+                return null;
             }
         }
-        else
-            title = event.getArgs();
-        event.getChannel().sendTyping().queue();
-        client.getLyrics(title).thenAccept(lyrics -> 
-        {
-            if(lyrics == null)
-            {
-                event.replyError("Lyrics for `" + title + "` could not be found!" + (event.getArgs().isEmpty() ? " Try entering the song name manually (`lyrics [song name]`)" : ""));
-                return;
-            }
+        return event.getArgs();
+    }
 
-            EmbedBuilder eb = new EmbedBuilder()
-                    .setAuthor(lyrics.getAuthor())
-                    .setColor(event.getSelfMember().getColor())
-                    .setTitle(lyrics.getTitle(), lyrics.getURL());
-            if(lyrics.getContent().length()>15000)
-            {
-                event.replyWarning("Lyrics for `" + title + "` found but likely not correct: " + lyrics.getURL());
+    private void fetchAndReplyWithLyrics(CommandEvent event, String title) {
+        client.getLyrics(title).thenAccept(lyrics -> {
+            if (lyrics == null) {
+                handleLyricsNotFound(event, title);
+            } else {
+                handleLyricsFound(event, lyrics, title);
             }
-            else if(lyrics.getContent().length()>2000)
-            {
-                String content = lyrics.getContent().trim();
-                while(content.length() > 2000)
-                {
-                    int index = content.lastIndexOf("\n\n", 2000);
-                    if(index == -1)
-                        index = content.lastIndexOf("\n", 2000);
-                    if(index == -1)
-                        index = content.lastIndexOf(" ", 2000);
-                    if(index == -1)
-                        index = 2000;
-                    event.reply(eb.setDescription(content.substring(0, index).trim()).build());
-                    content = content.substring(index).trim();
-                    eb.setAuthor(null).setTitle(null, null);
-                }
-                event.reply(eb.setDescription(content).build());
-            }
-            else
-                event.reply(eb.setDescription(lyrics.getContent()).build());
         });
+    }
+
+    private void handleLyricsNotFound(CommandEvent event, String title) {
+        String message = "Lyrics for `" + title + "` could not be found!"
+                + (event.getArgs().isEmpty() ? " Try entering the song name manually (`lyrics [song name]`)" : "");
+        event.replyError(message);
+    }
+
+    private void handleLyricsFound(CommandEvent event, Lyrics lyrics, String title) {
+        EmbedBuilder eb = new EmbedBuilder()
+                .setAuthor(lyrics.getAuthor())
+                .setColor(event.getSelfMember().getColor())
+                .setTitle(lyrics.getTitle(), lyrics.getURL());
+
+        if (lyrics.getContent().length() > 15000) {
+            event.replyWarning("Lyrics for `" + title + "` found but likely not correct: " + lyrics.getURL());
+        } else if (lyrics.getContent().length() > 2000) {
+            sendLongLyrics(event, lyrics.getContent(), eb);
+        } else {
+            event.reply(eb.setDescription(lyrics.getContent()).build());
+        }
+    }
+
+    private void sendLongLyrics(CommandEvent event, String content, EmbedBuilder eb) {
+        String trimmedContent = content.trim();
+        while (trimmedContent.length() > 2000) {
+            int index = getSplitIndex(trimmedContent, 2000);
+            event.reply(eb.setDescription(trimmedContent.substring(0, index).trim()).build());
+            trimmedContent = trimmedContent.substring(index).trim();
+            eb.setAuthor(null).setTitle(null, null);
+        }
+        event.reply(eb.setDescription(trimmedContent).build());
+    }
+
+    private int getSplitIndex(String content, int maxLength) {
+        int index = content.lastIndexOf("\n\n", maxLength);
+        if (index == -1) index = content.lastIndexOf("\n", maxLength);
+        if (index == -1) index = content.lastIndexOf(" ", maxLength);
+        return (index == -1) ? maxLength : index;
     }
 
 }

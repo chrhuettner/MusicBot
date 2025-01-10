@@ -20,6 +20,7 @@ import com.jagrosh.jmusicbot.utils.OtherUtil;
 import com.jagrosh.jmusicbot.utils.TimeUtil;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.typesafe.config.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,17 +30,14 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 
 /**
- * 
- * 
  * @author John Grosh (jagrosh)
  */
-public class BotConfig
-{
+public class BotConfig {
     private final Prompt prompt;
     private final static String CONTEXT = "Config";
     private final static String START_TOKEN = "/// START OF JMUSICBOT CONFIG ///";
     private final static String END_TOKEN = "/// END OF JMUSICBOT CONFIG ///";
-    
+
     private Path path = null;
     private String token, prefix, altprefix, helpWord, playlistsFolder, logLevel,
             evalEngine;
@@ -58,18 +56,18 @@ public class BotConfig
     private static BotConfig botConfig;
 
 
-    private BotConfig(Prompt prompt)
-    {
+    private BotConfig(Prompt prompt) {
         this.prompt = prompt;
     }
 
-    public static BotConfig getInstance(){
-        if(botConfig == null){
+    public static BotConfig getInstance() {
+        if (botConfig == null) {
             throw new RuntimeException("Bot config was not initialized at startup!");
         }
 
         return botConfig;
     }
+
     public static BotConfig createConfig(Prompt prompt) {
         botConfig = new BotConfig(prompt);
         botConfig.valid = false;
@@ -98,13 +96,22 @@ public class BotConfig
     }
 
     private void setConfigValues(Config config) {
+        setEmojiMap(config);
+        setBasicConfigValues(config);
+        setBehaviorConfigValues(config);
+        setAdvancedConfigValues(config);
+    }
+
+    private void setEmojiMap(Config config) {
         emojiMap = new HashMap<>();
         emojiMap.put("success", config.getString("success"));
         emojiMap.put("warning", config.getString("warning"));
         emojiMap.put("error", config.getString("error"));
         emojiMap.put("loading", config.getString("loading"));
         emojiMap.put("searching", config.getString("searching"));
+    }
 
+    private void setBasicConfigValues(Config config) {
         token = config.getString("token");
         prefix = config.getString("prefix");
         altprefix = config.getString("altprefix");
@@ -112,6 +119,9 @@ public class BotConfig
         owner = config.getLong("owner");
         game = OtherUtil.parseGame(config.getString("game"));
         status = OtherUtil.parseStatus(config.getString("status"));
+    }
+
+    private void setBehaviorConfigValues(Config config) {
         stayInChannel = config.getBoolean("stayinchannel");
         songInGame = config.getBoolean("songinstatus");
         npImages = config.getBoolean("npimages");
@@ -119,6 +129,9 @@ public class BotConfig
         logLevel = config.getString("loglevel");
         useEval = config.getBoolean("eval");
         evalEngine = config.getString("evalengine");
+    }
+
+    private void setAdvancedConfigValues(Config config) {
         maxSeconds = config.getLong("maxtime");
         maxYTPlaylistPages = config.getInt("maxytplaylistpages");
         aloneTimeUntilStop = config.getLong("alonetimeuntilstop");
@@ -126,7 +139,7 @@ public class BotConfig
         aliases = config.getConfig("aliases");
         transforms = config.getConfig("transforms");
         skipratio = config.getDouble("skipratio");
-        dbots = owner == 113156185389092864L;
+        dbots = (owner == 113156185389092864L);
     }
 
     private boolean validateBotToken() {
@@ -156,227 +169,181 @@ public class BotConfig
         }
         return false;
     }
-    
-    private void writeToFile()
-    {
+
+    private void writeToFile() {
         byte[] bytes = loadDefaultConfig().replace("BOT_TOKEN_HERE", token)
                 .replace("0 // OWNER ID", Long.toString(owner))
                 .trim().getBytes();
-        try 
-        {
+        try {
             Files.write(path, bytes);
-        }
-        catch(IOException ex) 
-        {
-            prompt.alert(Prompt.Level.WARNING, CONTEXT, "Failed to write new config options to config.txt: "+ex
-                + "\nPlease make sure that the files are not on your desktop or some other restricted area.\n\nConfig Location: " 
-                + path.toAbsolutePath().toString());
+        } catch (IOException ex) {
+            prompt.alert(Prompt.Level.WARNING, CONTEXT, "Failed to write new config options to config.txt: " + ex
+                    + "\nPlease make sure that the files are not on your desktop or some other restricted area.\n\nConfig Location: "
+                    + path.toAbsolutePath().toString());
         }
     }
-    
-    private static String loadDefaultConfig()
-    {
+
+    private static String loadDefaultConfig() {
         String original = OtherUtil.loadResource(new JMusicBot(), "/reference.conf");
-        return original==null 
-                ? "token = BOT_TOKEN_HERE\r\nowner = 0 // OWNER ID" 
-                : original.substring(original.indexOf(START_TOKEN)+START_TOKEN.length(), original.indexOf(END_TOKEN)).trim();
+        return original == null
+                ? "token = BOT_TOKEN_HERE\r\nowner = 0 // OWNER ID"
+                : original.substring(original.indexOf(START_TOKEN) + START_TOKEN.length(), original.indexOf(END_TOKEN)).trim();
     }
-    
-    private static Path getConfigPath()
-    {
+
+    private static Path getConfigPath() {
         Path path = OtherUtil.getPath(System.getProperty("config.file", System.getProperty("config", "config.txt")));
-        if(path.toFile().exists())
-        {
-            if(System.getProperty("config.file") == null)
+        if (path.toFile().exists()) {
+            if (System.getProperty("config.file") == null)
                 System.setProperty("config.file", System.getProperty("config", path.toAbsolutePath().toString()));
             ConfigFactory.invalidateCaches();
         }
         return path;
     }
-    
-    public static void writeDefaultConfig()
-    {
+
+    public static void writeDefaultConfig() {
         Prompt prompt = new Prompt(null, null, true, true);
         prompt.alert(Prompt.Level.INFO, "JMusicBot Config", "Generating default config file");
         Path path = BotConfig.getConfigPath();
         byte[] bytes = BotConfig.loadDefaultConfig().getBytes();
-        try
-        {
+        try {
             prompt.alert(Prompt.Level.INFO, "JMusicBot Config", "Writing default config file to " + path.toAbsolutePath().toString());
             Files.write(path, bytes);
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             prompt.alert(Prompt.Level.ERROR, "JMusicBot Config", "An error occurred writing the default config file: " + ex.getMessage());
         }
     }
-    
-    public boolean isValid()
-    {
+
+    public boolean isValid() {
         return valid;
     }
-    
-    public String getConfigLocation()
-    {
+
+    public String getConfigLocation() {
         return path.toFile().getAbsolutePath();
     }
-    
-    public String getPrefix()
-    {
+
+    public String getPrefix() {
         return prefix;
     }
-    
-    public String getAltPrefix()
-    {
+
+    public String getAltPrefix() {
         return "NONE".equalsIgnoreCase(altprefix) ? null : altprefix;
     }
-    
-    public String getToken()
-    {
+
+    public String getToken() {
         return token;
     }
-    
-    public double getSkipRatio()
-    {
+
+    public double getSkipRatio() {
         return skipratio;
     }
-    
-    public long getOwnerId()
-    {
+
+    public long getOwnerId() {
         return owner;
     }
-    
-    public String getSuccess()
-    {
+
+    public String getSuccess() {
         return emojiMap.get("success");
     }
-    
-    public String getWarning()
-    {
+
+    public String getWarning() {
         return emojiMap.get("warning");
     }
-    
-    public String getError()
-    {
+
+    public String getError() {
         return emojiMap.get("error");
     }
-    
-    public String getLoading()
-    {
+
+    public String getLoading() {
         return emojiMap.get("loading");
     }
-    
-    public String getSearching()
-    {
+
+    public String getSearching() {
         return emojiMap.get("searching");
     }
-    
-    public Activity getGame()
-    {
+
+    public Activity getGame() {
         return game;
     }
-    
-    public boolean isGameNone()
-    {
+
+    public boolean isGameNone() {
         return game != null && game.getName().equalsIgnoreCase("none");
     }
-    
-    public OnlineStatus getStatus()
-    {
+
+    public OnlineStatus getStatus() {
         return status;
     }
-    
-    public String getHelp()
-    {
+
+    public String getHelp() {
         return helpWord;
     }
-    
-    public boolean getStay()
-    {
+
+    public boolean getStay() {
         return stayInChannel;
     }
-    
-    public boolean getSongInStatus()
-    {
+
+    public boolean getSongInStatus() {
         return songInGame;
     }
-    
-    public String getPlaylistsFolder()
-    {
+
+    public String getPlaylistsFolder() {
         return playlistsFolder;
     }
-    
-    public boolean getDBots()
-    {
+
+    public boolean getDBots() {
         return dbots;
     }
-    
-    public boolean useUpdateAlerts()
-    {
+
+    public boolean useUpdateAlerts() {
         return updatealerts;
     }
 
-    public String getLogLevel()
-    {
+    public String getLogLevel() {
         return logLevel;
     }
 
-    public boolean useEval()
-    {
+    public boolean useEval() {
         return useEval;
     }
-    
-    public String getEvalEngine()
-    {
+
+    public String getEvalEngine() {
         return evalEngine;
     }
-    
-    public boolean useNPImages()
-    {
+
+    public boolean useNPImages() {
         return npImages;
     }
-    
-    public long getMaxSeconds()
-    {
+
+    public long getMaxSeconds() {
         return maxSeconds;
     }
-    
-    public int getMaxYTPlaylistPages()
-    {
+
+    public int getMaxYTPlaylistPages() {
         return maxYTPlaylistPages;
     }
-    
-    public String getMaxTime()
-    {
+
+    public String getMaxTime() {
         return TimeUtil.formatTime(maxSeconds * 1000);
     }
 
-    public long getAloneTimeUntilStop()
-    {
+    public long getAloneTimeUntilStop() {
         return aloneTimeUntilStop;
     }
-    
-    public boolean isTooLong(AudioTrack track)
-    {
-        if(maxSeconds<=0)
+
+    public boolean isTooLong(AudioTrack track) {
+        if (maxSeconds <= 0)
             return false;
-        return Math.round(track.getDuration()/1000.0) > maxSeconds;
+        return Math.round(track.getDuration() / 1000.0) > maxSeconds;
     }
 
-    public String[] getAliases(String command)
-    {
-        try
-        {
+    public String[] getAliases(String command) {
+        try {
             return aliases.getStringList(command).toArray(new String[0]);
-        }
-        catch(NullPointerException | ConfigException.Missing e)
-        {
+        } catch (NullPointerException | ConfigException.Missing e) {
             return new String[0];
         }
     }
-    
-    public Config getTransforms()
-    {
+
+    public Config getTransforms() {
         return transforms;
     }
 }

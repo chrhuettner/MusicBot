@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author John Grosh (john.a.grosh@gmail.com)
  */
-public class SettingsManager implements GuildSettingsManager<Settings>
+public class SettingsManager implements GuildSettingsManager<Settings>, SettingsWriter
 {
     private final static Logger LOG = LoggerFactory.getLogger("Settings");
     private final static String SETTINGS_FILE = "serversettings.json";
@@ -99,36 +99,34 @@ public class SettingsManager implements GuildSettingsManager<Settings>
         return new Settings(this);
     }
 
-    protected void writeSettings()
-    {
+    @Override
+    public void writeSettings() {
         JSONObject obj = new JSONObject();
-        settings.keySet().stream().forEach(key -> {
-            JSONObject o = new JSONObject();
-            Settings s = settings.get(key);
-            if(s.textId!=0)
-                o.put("text_channel_id", Long.toString(s.textId));
-            if(s.voiceId!=0)
-                o.put("voice_channel_id", Long.toString(s.voiceId));
-            if(s.roleId!=0)
-                o.put("dj_role_id", Long.toString(s.roleId));
-            if(s.getVolume()!=100)
-                o.put("volume",s.getVolume());
-            if(s.getDefaultPlaylist() != null)
-                o.put("default_playlist", s.getDefaultPlaylist());
-            if(s.getRepeatMode()!=RepeatMode.OFF)
-                o.put("repeat_mode", s.getRepeatMode());
-            if(s.getPrefix() != null)
-                o.put("prefix", s.getPrefix());
-            if(s.getSkipRatio() != -1)
-                o.put("skip_ratio", s.getSkipRatio());
-            if(s.getQueueType() != QueueType.FAIR)
-                o.put("queue_type", s.getQueueType().name());
-            obj.put(Long.toString(key), o);
+        settings.forEach((key, s) -> {
+            JSONObject settingsJson = buildSettingsJson(s);
+            obj.put(Long.toString(key), settingsJson);
         });
+
         try {
             Files.write(OtherUtil.getPath(SETTINGS_FILE), obj.toString(4).getBytes());
-        } catch(IOException ex){
-            LOG.warn("Failed to write to file: "+ex);
+        } catch (IOException ex) {
+            LOG.warn("Failed to write to file: " + ex);
         }
+    }
+
+    private JSONObject buildSettingsJson(Settings s) {
+        JSONObject o = new JSONObject();
+
+        if (s.textId != 0) o.put("text_channel_id", Long.toString(s.textId));
+        if (s.voiceId != 0) o.put("voice_channel_id", Long.toString(s.voiceId));
+        if (s.roleId != 0) o.put("dj_role_id", Long.toString(s.roleId));
+        if (s.getVolume() != 100) o.put("volume", s.getVolume());
+        if (s.getDefaultPlaylist() != null) o.put("default_playlist", s.getDefaultPlaylist());
+        if (s.getRepeatMode() != RepeatMode.OFF) o.put("repeat_mode", s.getRepeatMode());
+        if (s.getPrefix() != null) o.put("prefix", s.getPrefix());
+        if (s.getSkipRatio() != -1) o.put("skip_ratio", s.getSkipRatio());
+        if (s.getQueueType() != QueueType.FAIR) o.put("queue_type", s.getQueueType().name());
+
+        return o;
     }
 }

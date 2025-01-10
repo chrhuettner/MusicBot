@@ -78,44 +78,55 @@ public class NowplayingHandler
     {
         lastNP.remove(guild.getIdLong());
     }
-    
-    private void updateAll()
-    {
+
+    private void updateAll() {
         Set<Long> toRemove = new HashSet<>();
         JDA jda = JDAProvider.getInstance();
-        for(long guildId: lastNP.keySet())
-        {
-            Guild guild = jda.getGuildById(guildId);
-            if(guild==null)
-            {
-                toRemove.add(guildId);
-                continue;
-            }
-            Pair<Long,Long> pair = lastNP.get(guildId);
-            TextChannel tc = guild.getTextChannelById(pair.getKey());
-            if(tc==null)
-            {
-                toRemove.add(guildId);
-                continue;
-            }
-            AudioHandler handler = (AudioHandler)guild.getAudioManager().getSendingHandler();
-            Message msg = handler.getNowPlaying(jda);
-            if(msg==null)
-            {
-                msg = handler.getNoMusicPlaying(jda);
-                toRemove.add(guildId);
-            }
-            try 
-            {
-                tc.editMessageById(pair.getValue(), msg).queue(m->{}, t -> lastNP.remove(guildId));
-            } 
-            catch(Exception e) 
-            {
+
+        for (long guildId : lastNP.keySet()) {
+            if (!processGuildUpdate(jda, guildId, toRemove)) {
                 toRemove.add(guildId);
             }
         }
+
+        removeInvalidGuilds(toRemove);
+    }
+
+    private boolean processGuildUpdate(JDA jda, long guildId, Set<Long> toRemove) {
+        Guild guild = jda.getGuildById(guildId);
+        if (guild == null) {
+            return false;
+        }
+
+        Pair<Long, Long> pair = lastNP.get(guildId);
+        TextChannel tc = guild.getTextChannelById(pair.getKey());
+        if (tc == null) {
+            return false;
+        }
+
+        Message msg = getUpdatedNowPlayingMessage(jda, guild);
+        return updateNowPlayingMessage(tc, pair.getValue(), msg, guildId);
+    }
+
+    private Message getUpdatedNowPlayingMessage(JDA jda, Guild guild) {
+        AudioHandler handler = (AudioHandler) guild.getAudioManager().getSendingHandler();
+        Message msg = handler.getNowPlaying(jda);
+        return (msg != null) ? msg : handler.getNoMusicPlaying(jda);
+    }
+
+    private boolean updateNowPlayingMessage(TextChannel tc, long messageId, Message msg, long guildId) {
+        try {
+            tc.editMessageById(messageId, msg).queue(m -> {}, t -> lastNP.remove(guildId));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void removeInvalidGuilds(Set<Long> toRemove) {
         toRemove.forEach(lastNP::remove);
     }
+
 
     // "event"-based methods
     public void onTrackUpdate(AudioTrack track)

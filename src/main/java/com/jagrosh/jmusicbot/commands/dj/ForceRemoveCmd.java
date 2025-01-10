@@ -48,61 +48,65 @@ public class ForceRemoveCmd extends DJCommand
     }
 
     @Override
-    public void doCommand(CommandEvent event)
-    {
-        if (event.getArgs().isEmpty())
-        {
-            event.replyError("You need to mention a user!");
-            return;
-        }
+    public void doCommand(CommandEvent event) {
+        if (!validateArguments(event)) return;
 
         AudioHandler handler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
-        if (handler.getQueue().isEmpty())
-        {
+        if (!validateQueue(event, handler)) return;
+
+        List<Member> foundMembers = FinderUtil.findMembers(event.getArgs(), event.getGuild());
+        if (!validateFoundMembers(event, foundMembers)) return;
+
+        if (foundMembers.size() > 1) {
+            promptUserSelection(event, foundMembers);
+        } else {
+            removeAllEntries(foundMembers.get(0).getUser(), event);
+        }
+    }
+
+    private boolean validateArguments(CommandEvent event) {
+        if (event.getArgs().isEmpty()) {
+            event.replyError("You need to mention a user!");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateQueue(CommandEvent event, AudioHandler handler) {
+        if (handler.getQueue().isEmpty()) {
             event.replyError("There is nothing in the queue!");
-            return;
+            return false;
         }
+        return true;
+    }
 
-
-        User target;
-        List<Member> found = FinderUtil.findMembers(event.getArgs(), event.getGuild());
-
-        if(found.isEmpty())
-        {
+    private boolean validateFoundMembers(CommandEvent event, List<Member> found) {
+        if (found.isEmpty()) {
             event.replyError("Unable to find the user!");
-            return;
+            return false;
         }
-        else if(found.size()>1)
-        {
-            OrderedMenu.Builder builder = new OrderedMenu.Builder();
-            for(int i=0; i<found.size() && i<4; i++)
-            {
-                Member member = found.get(i);
-                builder.addChoice("**"+member.getUser().getName()+"**#"+member.getUser().getDiscriminator());
-            }
+        return true;
+    }
 
-            builder
-            .setSelection((msg, i) -> removeAllEntries(found.get(i-1).getUser(), event))
-            .setText("Found multiple users:")
-            .setColor(event.getSelfMember().getColor())
-            .useNumbers()
-            .setUsers(event.getAuthor())
-            .useCancelButton(true)
-            .setCancel((msg) -> {})
-            .setEventWaiter(EventWaiterProvider.getInstance())
-            .setTimeout(1, TimeUnit.MINUTES)
+    private void promptUserSelection(CommandEvent event, List<Member> foundMembers) {
+        OrderedMenu.Builder builder = new OrderedMenu.Builder();
 
-            .build().display(event.getChannel());
-
-            return;
-        }
-        else
-        {
-            target = found.get(0).getUser();
+        for (int i = 0; i < foundMembers.size() && i < 4; i++) {
+            Member member = foundMembers.get(i);
+            builder.addChoice("**" + member.getUser().getName() + "**#" + member.getUser().getDiscriminator());
         }
 
-        removeAllEntries(target, event);
-
+        builder.setSelection((msg, i) -> removeAllEntries(foundMembers.get(i - 1).getUser(), event))
+                .setText("Found multiple users:")
+                .setColor(event.getSelfMember().getColor())
+                .useNumbers()
+                .setUsers(event.getAuthor())
+                .useCancelButton(true)
+                .setCancel((msg) -> {})
+                .setEventWaiter(EventWaiterProvider.getInstance())
+                .setTimeout(1, TimeUnit.MINUTES)
+                .build()
+                .display(event.getChannel());
     }
 
     private void removeAllEntries(User target, CommandEvent event)

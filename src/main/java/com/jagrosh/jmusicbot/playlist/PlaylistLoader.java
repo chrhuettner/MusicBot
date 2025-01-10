@@ -25,6 +25,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -93,47 +94,57 @@ public class PlaylistLoader
     {
         Files.write(OtherUtil.getPath(config.getPlaylistsFolder()+File.separator+name+".txt"), text.trim().getBytes());
     }
-    
-    public Playlist getPlaylist(String name)
-    {
-        if(!getPlaylistNames().contains(name))
+
+    public Playlist getPlaylist(String name) {
+        if (!getPlaylistNames().contains(name)) {
             return null;
-        try
-        {
-            if(folderExists())
-            {
-                boolean[] shuffle = {false};
-                List<String> list = new ArrayList<>();
-                Files.readAllLines(OtherUtil.getPath(config.getPlaylistsFolder()+File.separator+name+".txt")).forEach(str -> 
-                {
-                    String s = str.trim();
-                    if(s.isEmpty())
-                        return;
-                    if(s.startsWith("#") || s.startsWith("//"))
-                    {
-                        s = s.replaceAll("\\s+", "");
-                        if(s.equalsIgnoreCase("#shuffle") || s.equalsIgnoreCase("//shuffle"))
-                            shuffle[0]=true;
-                    }
-                    else
-                        list.add(s);
-                });
-                if(shuffle[0])
-                    shuffle(list);
-                return new Playlist(name, list, shuffle[0]);
-            }
-            else
-            {
-                createFolder();
-                return null;
-            }
         }
-        catch(IOException e)
-        {
+
+        if (!folderExists()) {
+            createFolder();
+            return null;
+        }
+
+        return loadPlaylist(name);
+    }
+
+    private Playlist loadPlaylist(String name) {
+        List<String> trackList = new ArrayList<>();
+        boolean[] shuffleFlag = {false};
+
+        try {
+            Path playlistPath = OtherUtil.getPath(config.getPlaylistsFolder() + File.separator + name + ".txt");
+            Files.readAllLines(playlistPath).forEach(line -> processPlaylistLine(line, trackList, shuffleFlag));
+
+            if (shuffleFlag[0]) {
+                shuffle(trackList);
+            }
+
+            return new Playlist(name, trackList, shuffleFlag[0]);
+        } catch (IOException e) {
             return null;
         }
     }
-    
+
+    private void processPlaylistLine(String line, List<String> trackList, boolean[] shuffleFlag) {
+        String trimmedLine = line.trim();
+        if (trimmedLine.isEmpty()) {
+            return;
+        }
+
+        if (trimmedLine.startsWith("#") || trimmedLine.startsWith("//")) {
+            checkForShuffleFlag(trimmedLine, shuffleFlag);
+        } else {
+            trackList.add(trimmedLine);
+        }
+    }
+
+    private void checkForShuffleFlag(String line, boolean[] shuffleFlag) {
+        String formattedLine = line.replaceAll("\\s+", "");
+        if (formattedLine.equalsIgnoreCase("#shuffle") || formattedLine.equalsIgnoreCase("//shuffle")) {
+            shuffleFlag[0] = true;
+        }
+    }
     
     private static <T> void shuffle(List<T> list)
     {
