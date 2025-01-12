@@ -87,4 +87,18 @@ public class Bot
             GUI.getInstance().dispose();
         System.exit(0);
     }
+
+    /**
+     * For testing purposes
+     */
+    protected static void resetBot() {
+        bot = null;
+    }
+
+    /**
+     * For testing purposes
+     */
+    protected void setShutdownFlag(boolean value) {
+        this.shuttingDown = value;
+    }
 }
